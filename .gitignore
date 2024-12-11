@@ -1,0 +1,6 @@
+# editor directories
+.vs
+.vscode
+
+# build directory
+out
