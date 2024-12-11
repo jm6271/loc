@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 	auto end = std::chrono::high_resolution_clock::now();
 	chrono::duration<double, std::milli> duration = end - start;
 	
-	cout << " in " << duration << "\n";
+	cout << " in " << duration.count() << "ms\n";
 
 	return 0;
 }
