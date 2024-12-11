@@ -27,7 +27,7 @@ the C line counter for any file extension not recognized.
 
 ```-i [ --ignore ]``` - Semicolon-separated list of directories and files to ignore
 
-```extensions``` - Semicolon-separated list of extensions to search for
+```pattern``` - Semicolon-separated list of file extensions to search for
 
 ```path``` - Path to file or directory to search
 
