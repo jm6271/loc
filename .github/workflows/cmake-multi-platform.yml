@@ -34,4 +34,5 @@ jobs:
         cd build
         cmake ..
         make
-        ctest loc.tests
+        cd loc.tests
+        ./loc.tests
