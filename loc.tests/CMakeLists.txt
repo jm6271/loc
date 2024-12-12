@@ -26,3 +26,6 @@ include_directories("../loc")
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc.tests PROPERTY CXX_STANDARD 20)
 endif()
+
+include(Catch)
+catch_discover_tests(loc.tests)

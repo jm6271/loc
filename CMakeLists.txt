@@ -10,8 +10,9 @@ if (POLICY CMP0141)
 endif()
 
 project ("loc")
-project ("loc.tests")
 
 # Include sub-projects.
 add_subdirectory ("loc")
 add_subdirectory("loc.tests")
+
+enable_testing()
