@@ -217,7 +217,7 @@ Counter::FILE_LANGUAGE Counter::GetFileLanguage(std::string path)
     std::filesystem::path p{ path };
     std::string extension = p.extension().string();
 
-    if (p == ".py" || p == ".pyw")
+    if (extension == ".py" || p == ".pyw")
     {
         return FILE_LANGUAGE::Python;
     }
