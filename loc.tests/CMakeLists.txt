@@ -7,8 +7,12 @@ if (WIN32) # WIN32 is true on a windows system
 endif (WIN32)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-cmake_policy(SET CMP0144 NEW)
-cmake_policy(SET CMP0167 NEW)
+
+if (CMAKE_VERSION VERSION_GREATER 3.12)
+  cmake_policy(SET CMP0144 NEW)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 
 add_compile_definitions(TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_files")
 
