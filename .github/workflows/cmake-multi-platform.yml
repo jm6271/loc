@@ -34,4 +34,4 @@ jobs:
         cd build
         cmake ..
         make
-        ctest
+        ctest loc.tests
