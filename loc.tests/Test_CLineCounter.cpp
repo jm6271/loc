@@ -2,7 +2,7 @@
 
 #include "include/CLineCounter.h"
 
-TEST_CASE("CountLines")
+TEST_CASE("Count Lines in a C++ file")
 {
     CLineCounter counter;
 

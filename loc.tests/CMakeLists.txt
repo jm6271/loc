@@ -15,8 +15,8 @@ add_compile_definitions(TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_files")
 find_package(Catch2 3 REQUIRED)
 
 # Add source to this project's executable.
-add_executable (loc.tests "main.cpp" "Test_CLineCounter.cpp"
-    "../loc/CLineCounter.cpp" "../loc/FileReader.cpp")
+add_executable (loc.tests "main.cpp" "Test_CLineCounter.cpp" "Test_PyLineCounter.cpp"
+    "../loc/CLineCounter.cpp" "../loc/FileReader.cpp" "../loc/PyLineCounter.cpp")
 
 target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS})
 target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain)
@@ -26,10 +26,3 @@ include_directories("../loc")
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc.tests PROPERTY CXX_STANDARD 20)
 endif()
-
-include(CTest)
-include(Catch)
-
-catch_discover_tests(loc.tests)
-
-add_test(NAME "loc.tests" COMMAND loc.tests)
