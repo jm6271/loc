@@ -9,12 +9,12 @@ DirectoryScanner::DirectoryScanner()
     
 }
 
-    /**
-     * Scans a directory and returns a list of all the paths to the files with the given extensions
-     * @param directory the directory to scan
-     * @param extensions the extensions to look for
-     * @return a list of paths to the files found
-     */
+/**
+* Scans a directory and returns a list of all the paths to the files with the given extensions
+* @param directory the directory to scan
+* @param extensions the extensions to look for
+* @return a list of paths to the files found
+*/
 std::vector<std::string> DirectoryScanner::Scan(std::string directory, std::vector<std::string> extensions)
 {
     // Scan a directory and return a list of all the paths to the files with the given extensions

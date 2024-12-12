@@ -10,7 +10,4 @@ public:
     DirectoryScanner();
 
     std::vector<std::string> Scan(std::string directory, std::vector<std::string> extensions);
-
-private:
-
 };

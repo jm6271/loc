@@ -13,7 +13,7 @@
 class Counter
 {
 public:
-    Counter(unsigned int jobs, std::string extensions, std::vector<std::string> paths, std::string ignores);
+    Counter(unsigned int jobs, const std::string& extensions, const std::vector<std::string>& paths, const std::string& ignores);
 
     unsigned long Count();
 
@@ -23,17 +23,17 @@ private:
     std::vector<std::string> paths{};
     std::vector<std::string> ignorePaths{};
 
-    bool IsDirectory(std::string path);
+    bool IsDirectory(const std::filesystem::path& path) const;
 
-    std::vector<std::string> GetExtensions(std::string extensions);
+    std::vector<std::string> GetExtensions(const std::string& extensions_string) const;
 
-    std::vector<std::string> GetIgnorePaths(std::string ignores);
+    std::vector<std::string> GetIgnorePaths(const std::string& ignores) const;
 
     bool IsIgnored(std::string path);
 
     unsigned long CountFile(std::string path);
 
-    void normalizePath(std::string& path);
+    void normalizePath(std::string& path) const;
 
     enum class FILE_LANGUAGE
     {
@@ -41,9 +41,9 @@ private:
         Python
     };
 
-    FILE_LANGUAGE GetFileLanguage(std::string path);
+    FILE_LANGUAGE GetFileLanguage(const std::string& path) const;
 
-    bool isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath);
+    bool isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) const;
 
     std::vector<std::string> GetAllFilesWithExtensionsInDirectories();
 

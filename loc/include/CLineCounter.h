@@ -4,8 +4,8 @@
 
 #include "ILineCounter.h"
 
-class CLineCounter : ILineCounter
+class CLineCounter : public ILineCounter
 {
 public:
-	unsigned long CountLines(std::string path) override;
+	unsigned long CountLines(std::string& path) override;
 };

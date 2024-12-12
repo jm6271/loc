@@ -2,8 +2,8 @@
 
 #include "ILineCounter.h"
 
-class PyLineCounter : ILineCounter
+class PyLineCounter : public ILineCounter
 {
 public:
-    unsigned long CountLines(std::string path) override;
+    unsigned long CountLines(std::string& path) override;
 };

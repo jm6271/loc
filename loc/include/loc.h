@@ -19,5 +19,5 @@
 struct comma_numpunct : std::numpunct<char> 
 { 
 protected: 
-    virtual std::string do_grouping() const override { return "\3"; } 
+    std::string do_grouping() const override { return "\3"; } 
 };

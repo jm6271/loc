@@ -17,7 +17,7 @@
  * This constructor initializes the Counter object and starts the threads for counting. The
  * threads are started after the constructor is finished.
  */
-Counter::Counter(unsigned int jobs, std::string extensions, std::vector<std::string> paths, std::string ignores)
+Counter::Counter(unsigned int jobs, const std::string& extensions, const std::vector<std::string>& paths, const std::string& ignores)
 {
     this->jobs = jobs;
     this->paths = paths;
@@ -28,9 +28,8 @@ Counter::Counter(unsigned int jobs, std::string extensions, std::vector<std::str
     // put the files to be counted in the queue
     for (const auto& path : GetAllFilesWithExtensionsInDirectories())
     {
-        file_queue_mutex.lock();
+        std::scoped_lock<std::mutex> lock(file_queue_mutex);
         file_queue.push(path);
-        file_queue_mutex.unlock();
     }
 }
 
@@ -45,7 +44,7 @@ unsigned long Counter::Count()
     // Display the number of files that will be counted
     std::cout << "Counting " << file_queue.size() << " files..." << std::endl;
 
-    std::vector<std::thread> threads;
+    std::vector<std::jthread> threads;
 
     // jobs contains the number of threads to start, but we want each thread to count at least 5 files
     if (file_queue.size() < jobs * 5)
@@ -78,7 +77,7 @@ unsigned long Counter::Count()
  * @param path The path to check.
  * @return true if the path is a directory, false otherwise.
  */
-bool Counter::IsDirectory(std::string path)
+bool Counter::IsDirectory(const std::filesystem::path& path) const
 {
     // Check if the path is a directory
     return std::filesystem::exists(path) && std::filesystem::is_directory(path);
@@ -89,13 +88,13 @@ bool Counter::IsDirectory(std::string path)
  * @param extensions A string of all the file extensions to count, separated by semicolons.
  * @return A vector of the extensions.
  */
-std::vector<std::string> Counter::GetExtensions(std::string extensions)
+std::vector<std::string> Counter::GetExtensions(const std::string& extensions_string) const
 {
     // Extensions are separated by semicolons
     // Split them into a vector
     std::vector<std::string> extension_vector{};
 
-    std::stringstream ss{ extensions };
+    std::stringstream ss{ extensions_string };
     std::string extension{};
     while (std::getline(ss, extension, ';'))
     {
@@ -110,7 +109,7 @@ std::vector<std::string> Counter::GetExtensions(std::string extensions)
  * @param ignores A string of all the paths to ignore, separated by semicolons.
  * @return A vector of the ignore paths.
  */
-std::vector<std::string> Counter::GetIgnorePaths(std::string ignores)
+std::vector<std::string> Counter::GetIgnorePaths(const std::string& ignores) const
 {
     std::vector<std::string> ignoresVector{};
 
@@ -157,7 +156,7 @@ bool Counter::IsIgnored(std::string path)
  * This function is used to ensure that all paths are represented in the same way, regardless of the
  * OS. It is used to normalize the paths in the ignore list and the paths of the files to be counted.
  */
-void Counter::normalizePath(std::string& path) 
+void Counter::normalizePath(std::string& path) const 
 { 
 #ifdef _WIN32 
     const char slash = '\\';
@@ -209,7 +208,7 @@ unsigned long Counter::CountFile(std::string path)
  * @param path The file path to be analyzed.
  * @return The type of file language.
  */
-Counter::FILE_LANGUAGE Counter::GetFileLanguage(std::string path)
+Counter::FILE_LANGUAGE Counter::GetFileLanguage(const std::string& path) const
 {
     // if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then set return C
     // if the path ends with .py or .pyw then set return Python
@@ -239,7 +238,7 @@ Counter::FILE_LANGUAGE Counter::GetFileLanguage(std::string path)
  * file path is within the parent directory by using the lexically_relative() function. If the file path is within
  * the parent directory, it returns true. Otherwise, it returns false.
  */
-bool Counter::isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) 
+bool Counter::isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) const
 { 
     if (!std::filesystem::exists(parentDir) || !std::filesystem::is_directory(parentDir)) 
     { 
@@ -315,15 +314,18 @@ void Counter::CounterWorker()
     while (true)
     {
         // get a path off the queue
-        file_queue_mutex.lock();
-        if (file_queue.size() == 0)
+        std::string path{};
         {
-            file_queue_mutex.unlock();
-            return;
+            std::scoped_lock<std::mutex> lock(file_queue_mutex);
+            
+            if (file_queue.size() == 0)
+            {
+                return;
+            }
+            path = file_queue.front();
+            file_queue.pop();          
         }
-        std::string path = file_queue.front();
-        file_queue.pop();
-        file_queue_mutex.unlock();
+
 
         // count the lines of code in the file
         unsigned long lines = CountFile(path);

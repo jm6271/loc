@@ -9,6 +9,9 @@ TEST_CASE("Count Lines in a C++ file")
     // Test files directory
     auto test_dir = std::string(TEST_DATA_DIR);
 
-    REQUIRE(counter.CountLines(test_dir + "/cpp_file.cpp") == 6);
-    REQUIRE(counter.CountLines(test_dir + "/header.h") == 13);
+    std::string cpp_path = test_dir + "/cpp_file.cpp";
+    std::string header_path = test_dir + "/header.h";
+
+    REQUIRE(counter.CountLines(cpp_path) == 6);
+    REQUIRE(counter.CountLines(header_path) == 13);
 }

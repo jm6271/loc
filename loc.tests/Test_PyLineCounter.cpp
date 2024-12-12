@@ -8,5 +8,7 @@ TEST_CASE("Count lines in a Python file")
     // Test files directory
     auto test_dir = std::string(TEST_DATA_DIR);
 
-    REQUIRE(counter.CountLines(test_dir + "/py_file.py") == 5);
+    std::string py_path = test_dir + "/py_file.py";
+
+    REQUIRE(counter.CountLines(py_path) == 5);
 }
