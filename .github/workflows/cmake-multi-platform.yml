@@ -35,6 +35,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
+        echo $(pwd)
         cmake --preset=linux-debug ..
         cd ../out/build/linux-debug
         ninja
