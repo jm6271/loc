@@ -23,7 +23,9 @@ jobs:
         ./bootstrap-vcpkg.sh
         cd ..
         export VCPKG_ROOT="$(pwd)/vcpkg"
+        echo $(VCPKG_ROOT)
         export PATH=$VCPKG_ROOT:$PATH
+        echo $(PATH)
 
     - name: Install Ninja
       run: sudo apt install ninja-build -y
