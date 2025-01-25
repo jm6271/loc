@@ -24,6 +24,7 @@ jobs:
         cd ..
         export VCPKG_ROOT="$(pwd)/vcpkg"
         export PATH=$VCPKG_ROOT:$PATH
+        sudo apt install pkg-config -y
 
     - name: Build and run tests
       run: |
