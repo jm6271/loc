@@ -7,8 +7,11 @@
 #endif (WIN32)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-cmake_policy(SET CMP0144 NEW)
-cmake_policy(SET CMP0167 NEW)
+
+if (CMAKE_VERSION VERSION_GREATER 3.30)
+    cmake_policy(SET CMP0144 NEW)
+    cmake_policy(SET CMP0167 NEW)
+endif()
 
 find_package(Boost REQUIRED COMPONENTS program_options)
 
