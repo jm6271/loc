@@ -24,13 +24,16 @@ jobs:
         cd ..
         export VCPKG_ROOT="$(pwd)/vcpkg"
         export PATH=$VCPKG_ROOT:$PATH
-        sudo apt install pkg-config -y
+
+    - name: Install Ninja
+      run: sudo apt install ninja-build -y
 
     - name: Build and run tests
       run: |
         mkdir -p build
         cd build
         cmake --preset=linux-debug ..
-        make
+        cd ../out/build/linux-debug
+        ninja
         cd loc.tests
         ./loc.tests
