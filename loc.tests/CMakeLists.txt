@@ -2,10 +2,6 @@
 # project specific logic here.
 
 
-if (WIN32) # WIN32 is true on a windows system
-    set(CATCH2_ROOT "C:/libs/Catch2")
-endif (WIN32)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 cmake_policy(SET CMP0144 NEW)
 cmake_policy(SET CMP0167 NEW)

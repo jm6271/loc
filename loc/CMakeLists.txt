@@ -2,9 +2,9 @@
 # project specific logic here.
 
 
-if (WIN32) # WIN32 is true on a windows system
-    set(BOOST_ROOT "C:/libs/Boost")
-endif (WIN32)
+#if (WIN32) # WIN32 is true on a windows system
+    #set(BOOST_ROOT "C:/libs/Boost")
+#endif (WIN32)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 cmake_policy(SET CMP0144 NEW)
