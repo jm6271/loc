@@ -13,7 +13,7 @@ if (CMAKE_VERSION VERSION_GREATER 3.30)
     cmake_policy(SET CMP0167 NEW)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS program_options algorithm)
 
 # Add source to this project's executable.
 add_executable (loc "loc.cpp" "include/loc.h" 
@@ -23,7 +23,7 @@ add_executable (loc "loc.cpp" "include/loc.h"
     "Counter.cpp" "PyLineCounter.cpp" "include/PyLineCounter.h")
 
 target_include_directories(loc PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(loc Boost::program_options)
+target_link_libraries(loc Boost::program_options Boost::algorithm)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc PROPERTY CXX_STANDARD 20)
