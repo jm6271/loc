@@ -21,7 +21,7 @@ jobs:
 
     - name: Add Ninja to PATH
       run: |
-        echo "::add-path::$(ninja --version)"
+        echo "$env:GITHUB_ENV" >> ($env:PATH)
 
     - name: Install Visual Studio Build Tools
       uses: microsoft/setup-msbuild@v2
