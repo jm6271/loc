@@ -158,15 +158,8 @@ bool Counter::IsIgnored(std::string path)
  */
 void Counter::normalizePath(std::string& path) const 
 { 
-#ifdef _WIN32 
-    const char slash = '\\';
-    const char otherSlash = '/'; 
-#else 
-    const char slash = '/'; 
-    const char otherSlash = '\\'; 
-#endif 
-
-    std::replace(path.begin(), path.end(), otherSlash, slash);
+    std::filesystem::path p {path};
+    path = p.make_preferred().string();
 }
 
 /**
