@@ -16,6 +16,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Setup winget
+      uses: actions/setup-winget@v1
+
     - name: Install build tools
       run: |
         winget install Microsoft.VisualStudio.BuildTools
