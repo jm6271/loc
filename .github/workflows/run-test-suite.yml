@@ -57,3 +57,24 @@ jobs:
         cd out/build/linux-debug/loc.tests
         ./loc.tests
 
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install build tools
+      run: |
+        brew update
+        brew install cmake ninja
+
+    - name: Run build script
+      run: |
+        chmod +x .github/scripts/build-macos.sh
+        .github/scripts/build-macos.sh
+
+    - name: Run tests
+      run: |
+        cd out/build/macos-debug/loc.tests
+        ./loc.tests
