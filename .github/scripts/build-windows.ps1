@@ -11,9 +11,4 @@ $env:PATH = $env:VCPKG_ROOT + ";" + $env:PATH
 # Create build directory and configure
 New-Item -ItemType Directory -Path build -Force
 Set-Location -Path build
-cmake --preset=x64-debug ..
-
-# Build the project
-Set-Location -Path ..\out\build\x64-debug
-ninja
-Set-Location -Path ..\..\..
+cmake --preset=x64-debug --build ..
