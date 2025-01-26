@@ -1,6 +1,7 @@
 {
   "dependencies": [
     "boost-program-options",
-    "catch2"
+    "catch2",
+    "boost-algorithm"
   ]
 }

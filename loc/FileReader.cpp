@@ -1,7 +1,7 @@
 #include "include/FileReader.h"
 #include <fstream>
 #include <iostream>
-#include <algorithm>
+#include <boost/algorithm/string.hpp>
 
 /**
  * \brief Read a file line-by-line and store the lines in the output vector
@@ -23,7 +23,8 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 	{
 		while (std::getline(file, line))
 		{
-			output.push_back(rtrim(ltrim(line)));
+			boost::trim(line);
+			output.push_back(line);
 		}
 		file.close();
 	}
@@ -31,34 +32,4 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 	{
 		std::cerr << "Error: unable to open file: " << path << "\n";
 	}
-}
-
-/**
- * \brief Remove leading whitespace from a string.
- *
- * \param str The input string to trim.
- * \return A new string with leading whitespace removed.
- *
- * \details This function removes any leading whitespace characters from the
- * input string and returns the trimmed result. The original string is not modified.
- */
-std::string FileReader::ltrim(const std::string& str)
-{
-	std::string s = str;
-    auto it = std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    });
-    s.erase(s.begin(), it);
-
-	return s;
-}
-
-std::string FileReader::rtrim(const std::string &str)
-{
-	std::string s = str;
-    auto it = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    });
-    s.erase(it.base(), s.end());
-	return s;
 }
