@@ -19,6 +19,10 @@ jobs:
     - name: Setup Ninja
       uses: ashutoshvarma/setup-ninja@master
 
+    - name: Add Ninja to PATH
+      run: |
+        echo "::add-path::$(ninja --version)"
+
     - name: Install Visual Studio Build Tools
       uses: microsoft/setup-msbuild@v2
 
