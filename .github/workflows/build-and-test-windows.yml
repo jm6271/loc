@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install build tools
+      run: |
+        winget install Microsoft.VisualStudio.BuildTools
+        winget install -e --id Kitware.CMake
+        winget install -e --id Ninja.Ninja
+        winget install --id Git.Git -e --source winget
+
+    - name: Run build script
+      run: |
+        .github/scripts/build-windows.ps1
+
+    - name: Run tests
+      run: |
+        cd out/build/x64-debug/loc.tests
+        ./loc.tests
