@@ -16,28 +16,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install vcpkg
-      run: |
-        git clone https://github.com/microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.sh
-        cd ..
-      env:
-        VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-      
-    - name: Add vcpkg to PATH
-      run: echo "$VCPKG_ROOT" >> $GITHUB_PATH
+    - name: Run build script
+      run: .github/scripts/build-linux.sh
 
-    - name: Install Ninja
-      run: sudo apt install ninja-build -y
-
-    - name: Build and run tests
+    - name: Run tests
       run: |
-        mkdir -p build
-        cd build
-        export VCPKG_ROOT="$VCPKG_ROOT"
-        cmake --preset=linux-debug ..
-        cd ../out/build/linux-debug
-        ninja
-        cd loc.tests
+        cd out/build/linux-debug/loc.tests
         ./loc.tests
