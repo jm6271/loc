@@ -30,5 +30,7 @@ jobs:
 
     - name: Run tests
       run: |
-        cd out/build/x64-debug/loc.tests
+        cd out/build/x64-debug
+        ninja
+        cd loc.tests
         ./loc.tests
