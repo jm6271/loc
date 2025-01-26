@@ -20,15 +20,9 @@ jobs:
       run: choco install ninja --confirm
 
     - name: Install Visual Studio 2022 Build Tools
-      run: |
-        choco install visualstudio2022buildtools --confirm
-        choco install visualstudio2022-workload-vctools --confirm
-        choco install vswhere --confirm
-
-    - name: Set up Visual Studio environment
-      run: |
-        $vsInstallPath = &vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
-        & "$vsInstallPath\VC\Auxiliary\Build\vcvarsall.bat" x64
+      uses: TheMrMilchmann/setup-msvc-dev@v3
+      with: 
+        arch: x64
 
     - name: Run build script
       run: |
