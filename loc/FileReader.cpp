@@ -1,6 +1,7 @@
 #include "include/FileReader.h"
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 /**
  * \brief Read a file line-by-line and store the lines in the output vector
