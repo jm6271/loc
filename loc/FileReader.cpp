@@ -44,10 +44,10 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 std::string FileReader::ltrim(const std::string& str)
 {
 	std::string s = str;
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-		[](unsigned char ch) {
-			return !std::isspace(ch);
-		}));
+    auto it = std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    });
+    s.erase(s.begin(), it);
 
 	return s;
 }
@@ -55,9 +55,9 @@ std::string FileReader::ltrim(const std::string& str)
 std::string FileReader::rtrim(const std::string &str)
 {
 	std::string s = str;
-	s.erase(std::find_if(s.rbegin(), s.rend(),
-		[](unsigned char ch) {
-			return !std::isspace(ch);
-		}).base(), s.end());
+    auto it = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    });
+    s.erase(it.base(), s.end());
 	return s;
 }
