@@ -69,6 +69,14 @@ jobs:
         brew update
         brew install cmake ninja llvm
 
+    - name: Configure Environment for LLVM
+      run: |
+        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> $GITHUB_ENV
+        echo 'export LDFLAGS="-L/usr/local/opt/llvm/lib"' >> $GITHUB_ENV
+        echo 'export CPPFLAGS="-I/usr/local/opt/llvm/include"' >> $GITHUB_ENV
+        echo 'export CC=clang' >> $GITHUB_ENV
+        echo 'export CXX=clang++' >> $GITHUB_ENV
+
     - name: Run build script
       run: |
         chmod +x .github/scripts/build-macos.sh
