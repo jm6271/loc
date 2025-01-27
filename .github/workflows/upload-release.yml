@@ -38,14 +38,16 @@ jobs:
     - name: Create zip file
       run: powershell Compress-Archive -Path out\build\x64-release\loc\loc.exe -DestinationPath out\build\x64-release\loc-windows-x64.zip
 
+    # Upload the zip file that we created to the release
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: out/build/x64-release/loc/loc-windows-x64.zip
+        asset_path: out/build/x64-release/loc-windows-x64.zip
         asset_name: loc-windows-x64.zip
         asset_content_type: application/zip
-        token: ${{ secrets.GITHUB_TOKEN }}
 
   build-linux:
     runs-on: ubuntu-latest
@@ -73,11 +75,14 @@ jobs:
     - name: Create zip file
       run: zip -j out/build/linux-release/loc-linux-x64.zip out/build/linux-release/loc/loc
 
+    # Upload the zip file that we created to the release
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: actions/upload-release-asset@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: out/build/linux-release/loc-linux-x64.zip
         asset_name: loc-linux-x64.zip
         asset_content_type: application/zip
-        token: ${{ secrets.GITHUB_TOKEN }}
+
