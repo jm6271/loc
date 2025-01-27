@@ -67,13 +67,7 @@ jobs:
     - name: Install build tools
       run: |
         brew update
-        brew install cmake ninja gcc
-
-    - name: Configure Environment for GCC
-      run: |
-        echo 'export CC=gcc-$(brew list gcc | grep gcc | sed "s/.*gcc-\([0-9]*\)$/\1/")' >> $GITHUB_ENV
-        echo 'export CXX=g++-$(brew list gcc | grep g++ | sed "s/.*g++-\([0-9]*\)$/\1/")' >> $GITHUB_ENV
-
+        brew install cmake ninja
 
     - name: Run build script
       run: |
