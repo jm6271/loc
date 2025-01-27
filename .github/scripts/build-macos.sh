@@ -11,7 +11,7 @@ export PATH=${VCPKG_ROOT}:${PATH}
 # Create build directory and configure
 mkdir -p build
 cd build
-cmake --preset=macos-debug .. -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang
+cmake --preset=macos-debug .. -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC
 
 # Build the project
 cd ../out/build/macos-debug

@@ -67,15 +67,13 @@ jobs:
     - name: Install build tools
       run: |
         brew update
-        brew install cmake ninja llvm
+        brew install cmake ninja gcc
 
-    - name: Configure Environment for LLVM
+    - name: Configure Environment for GCC
       run: |
-        echo 'export PATH="/usr/local/opt/llvm/bin:$PATH"' >> $GITHUB_ENV
-        echo 'export LDFLAGS="-L/usr/local/opt/llvm/lib"' >> $GITHUB_ENV
-        echo 'export CPPFLAGS="-I/usr/local/opt/llvm/include"' >> $GITHUB_ENV
-        echo 'export CC=clang' >> $GITHUB_ENV
-        echo 'export CXX=clang++' >> $GITHUB_ENV
+        echo 'export CC=gcc-$(brew list gcc | grep gcc | sed "s/.*gcc-\([0-9]*\)$/\1/")' >> $GITHUB_ENV
+        echo 'export CXX=g++-$(brew list gcc | grep g++ | sed "s/.*g++-\([0-9]*\)$/\1/")' >> $GITHUB_ENV
+
 
     - name: Run build script
       run: |
