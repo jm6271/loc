@@ -11,9 +11,9 @@ export PATH=${VCPKG_ROOT}:${PATH}
 # Create build directory and configure
 mkdir -p build
 cd build
-cmake --preset=linux-debug ..
+cmake --preset=linux-release ..
 
 # Build the project
-cd ../out/build/linux-debug
+cd ../out/build/linux-release
 ninja
 cd ../../..
