@@ -10,6 +10,7 @@ programming project. It is written in C++ and designed to be very fast.
 - C
 - C++
 - C#
+- F#
 - Python
 
 Any C-style language should work, and the program uses 

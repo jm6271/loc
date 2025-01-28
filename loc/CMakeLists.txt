@@ -20,7 +20,8 @@ add_executable (loc "loc.cpp" "include/loc.h"
     "include/ILineCounter.h" "include/CLineCounter.h" 
     "CLineCounter.cpp" "include/FileReader.h" "FileReader.cpp" 
     "include/DirectoryScanner.h" "DirectoryScanner.cpp" "include/Counter.h" 
-    "Counter.cpp" "PyLineCounter.cpp" "include/PyLineCounter.h")
+    "Counter.cpp" "PyLineCounter.cpp" "include/PyLineCounter.h" 
+    "include/FSLineCounter.h" "FSLineCounter.cpp")
 
 target_include_directories(loc PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(loc Boost::program_options Boost::algorithm)
