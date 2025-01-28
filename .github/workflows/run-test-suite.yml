@@ -34,6 +34,8 @@ jobs:
         ninja
         cd loc.tests
         ./loc.tests
+        cd ../loc
+        ./loc --help
 
   build-linux:
     runs-on: ubuntu-latest
@@ -56,3 +58,5 @@ jobs:
       run: |
         cd out/build/linux-release/loc.tests
         ./loc.tests
+        cd ../loc
+        ./loc --help
