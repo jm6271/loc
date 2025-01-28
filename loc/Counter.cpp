@@ -6,6 +6,7 @@
 #include <future>
 #include <iostream>
 #include "include/PyLineCounter.h"
+#include "include/FSLineCounter.h"
 
 /**
  * Constructor for the Counter class.
@@ -188,6 +189,11 @@ unsigned long Counter::CountFile(std::string path)
         PyLineCounter counter;
         return counter.CountLines(path);
     }
+    else if (language == FILE_LANGUAGE::FSharp)
+    {
+        FSLineCounter counter;
+        return counter.CountLines(path);
+    }
     else
     {
         return 0;
@@ -203,15 +209,20 @@ unsigned long Counter::CountFile(std::string path)
  */
 Counter::FILE_LANGUAGE Counter::GetFileLanguage(const std::string& path) const
 {
-    // if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then set return C
-    // if the path ends with .py or .pyw then set return Python
+    // if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then return C
+    // if the path ends with .py or .pyw then return Python
+    // if the path ends with .fs or .fsx then return FSharp
 
     std::filesystem::path p{ path };
     std::string extension = p.extension().string();
 
-    if (extension == ".py" || p == ".pyw")
+    if (extension == ".py" || extension == ".pyw")
     {
         return FILE_LANGUAGE::Python;
+    }
+    else if (extension == ".fs" || extension == ".fsx")
+    {
+        return FILE_LANGUAGE::FSharp;
     }
     else // everything else is C
     {

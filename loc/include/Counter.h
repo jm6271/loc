@@ -38,7 +38,8 @@ private:
     enum class FILE_LANGUAGE
     {
         C,
-        Python
+        Python,
+        FSharp
     };
 
     FILE_LANGUAGE GetFileLanguage(const std::string& path) const;
