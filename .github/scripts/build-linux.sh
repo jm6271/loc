@@ -7,6 +7,8 @@ cd vcpkg
 cd ..
 export VCPKG_ROOT=$(pwd)/vcpkg
 export PATH=${VCPKG_ROOT}:${PATH}
+export CC=gcc-11
+export CXX=g++-11
 
 # Create build directory and configure
 mkdir -p build
