@@ -19,7 +19,7 @@ add_executable (loc "loc.cpp" "include/loc.h"
     "include/FSLineCounter.h" "FSLineCounter.cpp" "include/ExpandGlob.h" "ExpandGlob.cpp")
 
 target_include_directories(loc PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(loc Boost::program_options Boost::algorithm)
+target_link_libraries(loc PRIVATE Boost::program_options Boost::algorithm)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc PROPERTY CXX_STANDARD 20)

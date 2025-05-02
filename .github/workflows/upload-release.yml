@@ -36,7 +36,7 @@ jobs:
         cd ../../../..
 
     - name: Create zip file
-      run: powershell Compress-Archive -Path out\build\x64-release\loc\loc.exe -DestinationPath out\build\x64-release\loc-windows-x64.zip
+      run: powershell Compress-Archive -Path out\build\x64-release\loc\loc.exe,out\build\x64-release\loc\*.dll -DestinationPath out\build\x64-release\loc-windows-x64.zip
 
     # Upload the zip file that we created to the release
     - name: Upload Release Asset
@@ -70,7 +70,7 @@ jobs:
         cd ../../../..
 
     - name: Create zip file
-      run: zip -j out/build/linux-release/loc-linux-x64.zip out/build/linux-release/loc/loc
+      run: zip -j out/build/linux-release/loc-linux-x64.zip out/build/linux-release/loc/loc out/build/linux-release/loc/*.so.*
 
     # Upload the zip file that we created to the release
     - name: Upload Release Asset
