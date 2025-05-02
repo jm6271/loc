@@ -18,7 +18,7 @@ the C line counter for any file extension not recognized.
 
 ## Usage
 
-```loc [options] pattern path1 path2 ...```
+```loc [options] path1 path2 ...```
 
 ### Options
 
@@ -26,19 +26,17 @@ the C line counter for any file extension not recognized.
 
 ```-j [ --jobs ]``` - Number of threads to use. Default is number of CPU cores available
 
-```-i [ --ignore ]``` - Semicolon-separated list of directories and files to ignore
-
 ```pattern``` - Semicolon-separated list of file extensions to search for
 
-```path``` - Path to file or directory to search
+```path``` - Path to file. Can be a wildcard pattern
 
 ### Example
 
 To count the lines of code in the ```loc``` codebase from 
-the toplevel directory, ignoring the include directory and the loc.cpp file, and running on 10 threads, use this command:
+the toplevel directory running on 10 threads, use this command:
 
 ```
-loc -j 10 --ignore "loc/include;loc/loc.cpp" ".cpp;.h" ./loc
+loc -j 10 ./loc/*.cpp ./loc/include/*.h ./loc.tests/*.cpp
 ```
 
 ## Speed

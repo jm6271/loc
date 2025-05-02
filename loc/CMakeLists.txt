@@ -1,11 +1,6 @@
 ﻿# CMakeList.txt : CMake project for loc, include source and define
 # project specific logic here.
 
-
-#if (WIN32) # WIN32 is true on a windows system
-    #set(BOOST_ROOT "C:/libs/Boost")
-#endif (WIN32)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (CMAKE_VERSION VERSION_GREATER 3.30)
@@ -21,7 +16,7 @@ add_executable (loc "loc.cpp" "include/loc.h"
     "CLineCounter.cpp" "include/FileReader.h" "FileReader.cpp" 
     "include/DirectoryScanner.h" "DirectoryScanner.cpp" "include/Counter.h" 
     "Counter.cpp" "PyLineCounter.cpp" "include/PyLineCounter.h" 
-    "include/FSLineCounter.h" "FSLineCounter.cpp")
+    "include/FSLineCounter.h" "FSLineCounter.cpp" "include/ExpandGlob.h" "ExpandGlob.cpp")
 
 target_include_directories(loc PRIVATE ${Boost_INCLUDE_DIRS})
 target_link_libraries(loc Boost::program_options Boost::algorithm)

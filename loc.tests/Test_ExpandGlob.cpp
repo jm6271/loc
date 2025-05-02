@@ -1,28 +1,25 @@
 #include <catch2/catch_test_macros.hpp>
-#include "include/DirectoryScanner.h"
-#include <algorithm>
+#include "include/ExpandGlob.h"
 
-TEST_CASE("Test DirectoryScanner")
+TEST_CASE("Glob expands correctly")
 {
-    DirectoryScanner scanner;
-
     // Test files directory
     auto test_dir = std::string(TEST_DATA_DIR);
 
     // Expected data
     std::vector<std::string> expected{};
 
-    expected.push_back(test_dir + "/py_file.py");
-    expected.push_back(test_dir + "/cpp_file.cpp");
     expected.push_back(test_dir + "/cpp_file2.cpp");
-    expected.push_back(test_dir + "/header.h");
+    expected.push_back(test_dir + "/cpp_file.cpp");
 
     // Actual data
     std::vector<std::string> actual{};
-    actual = scanner.Scan(test_dir, {".cpp", ".py", ".h"});
 
-    // Check if the actual data matches the expected data
-    // Sort the vectors first to make sure items are in the same order
+    // Act
+    ExpandGlob expander{};
+    expander.expand_glob(test_dir + "/*.cpp", actual);
+
+    // Sort the vectors to make sure the items are in the same order
     std::sort(actual.begin(), actual.end());
     std::sort(expected.begin(), expected.end());
 
@@ -37,5 +34,6 @@ TEST_CASE("Test DirectoryScanner")
         std::replace(path.begin(), path.end(), '\\', '/');
     }
 
+    // Assert
     REQUIRE(actual == expected);
 }

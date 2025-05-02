@@ -7,6 +7,7 @@
 #include <iostream>
 #include "include/PyLineCounter.h"
 #include "include/FSLineCounter.h"
+#include "include/ExpandGlob.h"
 
 /**
  * Constructor for the Counter class.
@@ -18,16 +19,16 @@
  * This constructor initializes the Counter object and starts the threads for counting. The
  * threads are started after the constructor is finished.
  */
-Counter::Counter(unsigned int jobs, const std::string& extensions, const std::vector<std::string>& paths, const std::string& ignores)
+Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 {
     this->jobs = jobs;
     this->paths = paths;
 
-    this->extensions = GetExtensions(extensions);
-    this->ignorePaths = GetIgnorePaths(ignores);
+    // go through the paths and expand glob patterns
+    expandAllGlobsInPaths(this->paths);
 
     // put the files to be counted in the queue
-    for (const auto& path : GetAllFilesWithExtensionsInDirectories())
+    for (const auto& path : this->paths)
     {
         std::scoped_lock<std::mutex> lock(file_queue_mutex);
         file_queue.push(path);
@@ -82,72 +83,6 @@ bool Counter::IsDirectory(const std::filesystem::path& path) const
 {
     // Check if the path is a directory
     return std::filesystem::exists(path) && std::filesystem::is_directory(path);
-}
-
-/**
- * Split a string of extensions into a vector of strings.
- * @param extensions A string of all the file extensions to count, separated by semicolons.
- * @return A vector of the extensions.
- */
-std::vector<std::string> Counter::GetExtensions(const std::string& extensions_string) const
-{
-    // Extensions are separated by semicolons
-    // Split them into a vector
-    std::vector<std::string> extension_vector{};
-
-    std::stringstream ss{ extensions_string };
-    std::string extension{};
-    while (std::getline(ss, extension, ';'))
-    {
-        extension_vector.push_back(extension);
-    }
-
-    return extension_vector;
-}
-
-/**
- * Split a string of ignore paths into a vector of strings.
- * @param ignores A string of all the paths to ignore, separated by semicolons.
- * @return A vector of the ignore paths.
- */
-std::vector<std::string> Counter::GetIgnorePaths(const std::string& ignores) const
-{
-    std::vector<std::string> ignoresVector{};
-
-    std::stringstream ss{ ignores };
-    std::string ignore{};
-    while (std::getline(ss, ignore, ';'))
-    {
-        ignoresVector.push_back(ignore);
-    }
-
-    return ignoresVector;
-}
-
-/**
- * Check if a path is in the ignore paths list.
- * @param path The path to check.
- * @return true if the path is ignored, false otherwise.
- * 
- * This function normalizes the path and the ignore paths, then checks if the path is equal to or
- * inside any of the ignore paths.
- */
-bool Counter::IsIgnored(std::string path)
-{
-    normalizePath(path);
-
-    for (auto& p : ignorePaths)
-    {
-        normalizePath(p);
-        
-        if (p == path)
-            return true;
-        
-        if (isFileInDirectory(std::filesystem::path{ p }, std::filesystem::path{ path }))
-            return true;
-    }
-
-    return false;
 }
 
 /**
@@ -265,49 +200,6 @@ bool Counter::isFileInDirectory(const std::filesystem::path& parentDir, const st
 }
 
 /**
- * Retrieves all files with specified extensions from the configured directories.
- * 
- * This function iterates through the paths provided to the Counter instance. It checks each path
- * to determine if it is a directory. If a path is a directory and not ignored, it scans the directory
- * for files with the specified extensions using the DirectoryScanner. Files and directories that are
- * in the ignore list are skipped. All valid files found are added to the result list.
- * 
- * @return A vector of strings containing the paths of files that match the specified extensions and
- *         are not ignored.
- */
-std::vector<std::string> Counter::GetAllFilesWithExtensionsInDirectories()
-{
-    std::vector<std::string> files{};
-
-    for(const auto& path : paths)
-    {
-        if (IsDirectory(path))
-        {
-            if (IsIgnored(path))
-                continue;
-
-            DirectoryScanner scanner;
-            for(const auto& file : scanner.Scan(path, extensions))
-            {
-                if (IsIgnored(file))
-                    continue;
-
-                files.push_back(file);
-            }
-        }
-        else
-        {
-            if (IsIgnored(path))
-                continue;
-
-            files.push_back(path);
-        }
-    }
-
-    return files;
-}
-
-/**
  * Thread function for counting lines of code in files.
  * This function continuously takes paths off the file queue and counts the lines of code in each file.
  * The total number of lines is added to the total_lines atomic variable.
@@ -336,5 +228,18 @@ void Counter::CounterWorker()
 
         // add to total
         total_lines += lines;
+    }
+}
+
+void Counter::expandAllGlobsInPaths(std::vector<std::string>& paths)
+{
+    std::vector<std::string> copyVector = paths;
+    paths.clear();
+
+    for (auto& path : copyVector)
+    {
+        // run glob on the path
+        ExpandGlob expander{};
+        expander.expand_glob(path, paths);
     }
 }

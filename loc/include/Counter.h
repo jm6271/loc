@@ -13,23 +13,15 @@
 class Counter
 {
 public:
-    Counter(unsigned int jobs, const std::string& extensions, const std::vector<std::string>& paths, const std::string& ignores);
+    Counter(unsigned int jobs, const std::vector<std::string>& paths);
 
     unsigned long Count();
 
 private:
     unsigned int jobs{};
-    std::vector<std::string> extensions{};
     std::vector<std::string> paths{};
-    std::vector<std::string> ignorePaths{};
 
     bool IsDirectory(const std::filesystem::path& path) const;
-
-    std::vector<std::string> GetExtensions(const std::string& extensions_string) const;
-
-    std::vector<std::string> GetIgnorePaths(const std::string& ignores) const;
-
-    bool IsIgnored(std::string path);
 
     unsigned long CountFile(std::string path);
 
@@ -46,7 +38,7 @@ private:
 
     bool isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) const;
 
-    std::vector<std::string> GetAllFilesWithExtensionsInDirectories();
+    void expandAllGlobsInPaths(std::vector<std::string>& paths);
 
 
     // multi-threading stuff
