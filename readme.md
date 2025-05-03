@@ -16,6 +16,62 @@ programming project. It is written in C++ and designed to be very fast.
 Any C-style language should work, and the program uses 
 the C line counter for any file extension not recognized.
 
+## Installation
+
+1. Download the latest release binary for your platform from the GitHub Releases
+2. Extract the zip to a location on your path
+
+## Building from source
+
+Requires a C++ compiler, CMake, and ninja.
+
+### Windows:
+
+``` Powershell
+# clone the repo
+git clone https://github.com/jm6271/loc.git
+cd loc
+
+# setup vcpkg
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.bat
+cd ..
+$env:VCPKG_ROOT = (Get-Location).Path + "\vcpkg"
+$env:PATH = $env:VCPKG_ROOT + ";" + $env:PATH
+
+# build loc
+mkdir build
+cd build
+cmake --preset=x64-release build .. # replace preset with x86-release for 32-bit
+```
+
+### Linux:
+
+``` Bash
+# clone the repo
+git clone https://github.com/jm6271/loc.git
+cd loc
+
+# setup vcpkg
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg..sh
+cd ..
+export VCPKG_ROOT=$(pwd)/vcpkg
+export PATH=${VCPKG_ROOT}:${PATH}
+
+# Create build directory and configure
+mkdir -p build
+cd build
+cmake --preset=linux-release ..
+
+# Build the project
+cd ../out/build/linux-release
+ninja
+cd ../../..
+```
+
 ## Usage
 
 ```loc [options] path1 path2 ...```

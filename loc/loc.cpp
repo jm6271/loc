@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	description.add_options()
 		("help,h", bool_switch(&is_help), "Display help")
 		("jobs,j", value<unsigned int>()->default_value(default_jobs), "Number of threads to use. Default is number of CPU cores available")
-		("path", value<std::vector<std::string>>(), "Path to file or directory to search");
+		("path", value<std::vector<std::string>>(), "Path to a file to count");
 
 	positional_options_description positional;
 	positional.add("path", -1);
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 	{
 		// show help
 		cout << description;
-		cout << "\nExamle: loc -j 8 -i src/**/*.cpp src/include/*.h other.cpp\n";
+		cout << "\nExamle: loc -j 8 src/**/*.cpp src/include/*.h other.cpp\n";
 		return 0;
 	}
 
