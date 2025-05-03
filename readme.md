@@ -28,6 +28,8 @@ Requires a C++ compiler, CMake, and ninja.
 ### Windows:
 
 ``` Powershell
+# Powershell
+
 # clone the repo
 git clone https://github.com/jm6271/loc.git
 cd loc
@@ -49,6 +51,8 @@ cmake --preset=x64-release build .. # replace preset with x86-release for 32-bit
 ### Linux:
 
 ``` Bash
+# Bash
+
 # clone the repo
 git clone https://github.com/jm6271/loc.git
 cd loc
@@ -81,8 +85,6 @@ cd ../../..
 ```-h [ --help ]``` - Display help
 
 ```-j [ --jobs ]``` - Number of threads to use. Default is number of CPU cores available
-
-```pattern``` - Semicolon-separated list of file extensions to search for
 
 ```path``` - Path to file. Can be a wildcard pattern
 
