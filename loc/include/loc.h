@@ -10,7 +10,7 @@
 #include <chrono>
 #include <locale>
 
-#include <boost/program_options.hpp>
+#include <CLI/CLI.hpp>
 
 #include "Counter.h"
 
