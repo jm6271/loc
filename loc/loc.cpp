@@ -25,6 +25,23 @@ int main(int argc, char** argv)
 	files_command->add_option("paths", input_files, "List of paths to files to count")
 		->required()
 		->expected(1, -1);
+
+	
+	// directory command
+	auto directory_command = app.add_subcommand("dir", "Count lines of code in files matching a pattern in a directory");
+	string directory_path{};
+	string search_pattern{};
+	bool recursive = true;
+	bool gitignore = false;
+	directory_command->add_flag("-r,--recursive", recursive, "Search subdirectories")
+		->default_val(recursive);
+	directory_command->add_flag("-i,--gitignore", gitignore, "Ignore files found in .gitignore")
+		->default_val(gitignore);
+	directory_command->add_option("pattern", search_pattern, "Regex pattern to match filenames")
+		->required();
+	directory_command->add_option("directory", directory_path, "Directory to search")
+		->required()
+		->expected(1);
 	
 	// Parse the CLI arguments
 	CLI11_PARSE(app, argc, argv);
@@ -37,6 +54,10 @@ int main(int argc, char** argv)
 
 		// Print the lines of code
 		cout << "Counted " << lines << " lines of code";
+	}
+	else if (*directory_command)
+	{
+
 	}
 	else
 	{
