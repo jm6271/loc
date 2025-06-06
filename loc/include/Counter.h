@@ -7,6 +7,7 @@
 #include <mutex>
 #include <atomic>
 #include <filesystem>
+#include <fstream>
 
 #include "ILineCounter.h"
 
@@ -14,6 +15,8 @@ class Counter
 {
 public:
     Counter(unsigned int jobs, const std::vector<std::string>& paths);
+
+    Counter(unsigned int jobs, std::string& directoryPath, std::vector<std::string>& extensions);
 
     unsigned long Count();
 
@@ -39,7 +42,6 @@ private:
     bool isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) const;
 
     void expandAllGlobsInPaths(std::vector<std::string>& paths);
-
 
     // multi-threading stuff
     std::queue<std::string> file_queue{};

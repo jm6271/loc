@@ -28,16 +28,10 @@ int main(int argc, char** argv)
 
 	
 	// directory command
-	auto directory_command = app.add_subcommand("dir", "Count lines of code in files matching a pattern in a directory");
+	auto directory_command = app.add_subcommand("dir", "Count lines of code in files with provided extensions in a directory");
 	string directory_path{};
-	string search_pattern{};
-	bool recursive = true;
-	bool gitignore = false;
-	directory_command->add_flag("-r,--recursive", recursive, "Search subdirectories")
-		->default_val(recursive);
-	directory_command->add_flag("-i,--gitignore", gitignore, "Ignore files found in .gitignore")
-		->default_val(gitignore);
-	directory_command->add_option("pattern", search_pattern, "Regex pattern to match filenames")
+	vector<string> extensions{};
+	directory_command->add_option("-e,--extention", extensions, "Extensions of files to count")
 		->required();
 	directory_command->add_option("directory", directory_path, "Directory to search")
 		->required()
@@ -57,7 +51,10 @@ int main(int argc, char** argv)
 	}
 	else if (*directory_command)
 	{
+		Counter counter(jobs, directory_path, extensions);
+		auto lines = counter.Count();
 
+		cout << "Counted " << lines << " lines of code";
 	}
 	else
 	{

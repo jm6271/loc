@@ -12,9 +12,7 @@
 /**
  * Constructor for the Counter class.
  * @param jobs The number of threads to use.
- * @param extensions A string of all the file extensions to count, separated by semicolons.
- * @param paths A vector of paths to search for files. If a path is a directory, it is recursed.
- * @param ignores A string of all the paths to ignore, separated by semicolons.
+ * @param paths A vector of paths to search for files. Cannot include directories.
  * 
  * This constructor initializes the Counter object and starts the threads for counting. The
  * threads are started after the constructor is finished.
@@ -34,6 +32,24 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
         file_queue.push(path);
     }
 }
+
+
+Counter::Counter(unsigned int jobs, std::string &directoryPath, std::vector<std::string>& extensions)
+{
+    this->jobs = jobs;
+
+    // Get the paths to all the files that match the specified pattern, excluding files that match any patterns in ignorePatterns
+    DirectoryScanner directorScanner{};
+    paths = directorScanner.Scan(directoryPath, extensions);
+
+    // put the files to be counted in the queue
+    for (const auto& path : this->paths)
+    {
+        std::scoped_lock<std::mutex> lock(file_queue_mutex);
+        file_queue.push(path);
+    }
+}
+
 
 /**
  * Count the lines of code in all the files in the queue.
