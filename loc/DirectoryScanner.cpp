@@ -1,13 +1,7 @@
 #include "include/DirectoryScanner.h"
-#include <filesystem>
 #include <iostream>
 
 namespace fs = std::filesystem;
-
-DirectoryScanner::DirectoryScanner()
-{
-    
-}
 
 /**
 * Scans a directory and returns a list of all the paths to the files with the given extensions
@@ -15,7 +9,7 @@ DirectoryScanner::DirectoryScanner()
 * @param extensions the extensions to look for
 * @return a list of paths to the files found
 */
-std::vector<std::string> DirectoryScanner::Scan(std::string directory, std::vector<std::string> extensions)
+std::vector<std::string> DirectoryScanner::Scan(const fs::path& directory, const std::vector<std::string>& extensions) const
 {
     // Scan a directory and return a list of all the paths to the files with the given extensions
     std::vector<std::string> file_paths; 

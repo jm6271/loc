@@ -2,12 +2,13 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 // Class for scanning files in a directory
 class DirectoryScanner
 {
 public:
-    DirectoryScanner();
+    DirectoryScanner() = default;
 
-    std::vector<std::string> Scan(std::string directory, std::vector<std::string> extensions);
+    std::vector<std::string> Scan(const std::filesystem::path& directory, const std::vector<std::string>& extensions) const;
 };

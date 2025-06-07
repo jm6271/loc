@@ -34,7 +34,7 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 }
 
 
-Counter::Counter(unsigned int jobs, std::string &directoryPath, std::vector<std::string>& extensions)
+Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std::vector<std::string>& extensions)
 {
     this->jobs = jobs;
 
@@ -65,7 +65,7 @@ unsigned long Counter::Count()
     std::vector<std::jthread> threads;
 
     // jobs contains the number of threads to start, but we want each thread to count at least 5 files
-    if (file_queue.size() < jobs * 5)
+    if (file_queue.size() < size_t(jobs * 5))
     {
         jobs = static_cast<unsigned int>( file_queue.size() / 5);
         if (jobs == 0)
@@ -124,7 +124,7 @@ void Counter::normalizePath(std::string& path) const
  * @return The number of lines in the file.
  *         Returns 0 if the file type is not yet supported.
  */
-unsigned long Counter::CountFile(std::string path)
+unsigned long Counter::CountFile(const std::string& path) const
 {
     // Get the file language
     FILE_LANGUAGE language = GetFileLanguage(path);
@@ -223,22 +223,10 @@ bool Counter::isFileInDirectory(const std::filesystem::path& parentDir, const st
  */
 void Counter::CounterWorker()
 {
-    while (true)
+    std::string path{};
+
+    while (GetNextPath(path))
     {
-        // get a path off the queue
-        std::string path{};
-        {
-            std::scoped_lock<std::mutex> lock(file_queue_mutex);
-            
-            if (file_queue.size() == 0)
-            {
-                return;
-            }
-            path = file_queue.front();
-            file_queue.pop();          
-        }
-
-
         // count the lines of code in the file
         unsigned long lines = CountFile(path);
 
@@ -247,12 +235,25 @@ void Counter::CounterWorker()
     }
 }
 
-void Counter::expandAllGlobsInPaths(std::vector<std::string>& paths)
+bool Counter::GetNextPath(std::string& path)
 {
-    std::vector<std::string> copyVector = paths;
+    std::scoped_lock<std::mutex> lock(file_queue_mutex);
+
+    if (file_queue.empty())
+    {
+        return false;
+    }
+    path = file_queue.front();
+    file_queue.pop();
+    return true;
+}
+
+void Counter::expandAllGlobsInPaths(const std::vector<std::string>& paths_to_expand)
+{
+    std::vector<std::string> copyVector = paths_to_expand;
     paths.clear();
 
-    for (auto& path : copyVector)
+    for (auto const& path : copyVector)
     {
         // run glob on the path
         ExpandGlob expander{};
