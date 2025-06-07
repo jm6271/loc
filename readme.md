@@ -13,8 +13,8 @@ programming project. It is written in C++ and designed to be very fast.
 - F#
 - Python
 
-Any C-style language should work, and the program uses 
-the C line counter for any file extension not recognized.
+Any language that uses C-style comments should work. If the program
+doesn't recognize a file extension, it uses the C line counter.
 
 ## Installation
 
@@ -78,7 +78,7 @@ cd ../../..
 
 ## Usage
 
-```loc [options] path1 path2 ...```
+```loc [options] subcommand```
 
 ### Options
 
@@ -86,7 +86,35 @@ cd ../../..
 
 ```-j [ --jobs ]``` - Number of threads to use. Default is number of CPU cores available
 
-```path``` - Path to file. Can be a wildcard pattern
+#### Subcommands:
+
+##### ```files```
+
+Count the lines of code in individual files
+
+Usage: ```loc [options] files [options] path1 path2 ...```
+
+##### ```dir```
+
+Count the lines of code in files with the specified
+extensions in a directory
+
+Usage: ```loc [options] dir [options] directory```
+
+Options:
+
+```--cpp``` Search for files with C++ extensions
+
+```--cs``` Search for files with C# extensions
+
+```--py``` Search for files with Python extensions
+
+```--fs``` Search for files with F# extensions
+
+  ```--c``` Search for files with C extensions
+
+  ```-e,--extention TEXT ...```  Other extensions to pass in.
+  For example: ```loc dir -e .cpp -e .h .```
 
 ### Example
 
@@ -94,7 +122,13 @@ To count the lines of code in the ```loc``` codebase from
 the toplevel directory running on 10 threads, use this command:
 
 ```
-loc -j 10 ./loc/*.cpp ./loc/include/*.h ./loc.tests/*.cpp
+loc -j 10 files ./loc/*.cpp ./loc/include/*.h ./loc.tests/*.cpp
+```
+
+Or use the directory command:
+
+```
+loc -j 10 dir --cpp .
 ```
 
 ## Speed

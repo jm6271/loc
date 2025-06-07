@@ -1,7 +1,7 @@
 {
   "dependencies": [
-    "boost-program-options",
+    "boost-algorithm",
     "catch2",
-    "boost-algorithm"
+    "cli11"
   ]
 }
