@@ -1,7 +1,8 @@
 #include "include/FileReader.h"
 #include <fstream>
 #include <iostream>
-#include <boost/algorithm/string.hpp>
+#include <cctype>
+#include <algorithm>
 
 /**
  * \brief Read a file line-by-line and store the lines in the output vector
@@ -23,7 +24,7 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 	{
 		while (std::getline(file, line))
 		{
-			boost::trim(line);
+			ltrim(line);
 			output.push_back(line);
 		}
 		file.close();
@@ -32,4 +33,13 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 	{
 		std::cerr << "Error: unable to open file: " << path << "\n";
 	}
+}
+
+void FileReader::ltrim(std::string &s) {
+    s.erase(
+        s.begin(),
+        std::find_if_not(s.begin(), s.end(), [](unsigned char ch) {
+            return std::isspace(ch);
+        })
+    );
 }

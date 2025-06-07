@@ -13,15 +13,14 @@ endif()
 add_compile_definitions(TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_files")
 
 find_package(Catch2 3 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS algorithm)
 
 # Add source to this project's executable.
 add_executable (loc.tests "main.cpp" "Test_CLineCounter.cpp" "Test_PyLineCounter.cpp" "Test_DirectoryScanner.cpp" "Test_Counter.cpp"
     "../loc/CLineCounter.cpp" "../loc/FileReader.cpp" "../loc/PyLineCounter.cpp" "../loc/DirectoryScanner.cpp" "../loc/Counter.cpp" 
     "Test_FSLineCounter.cpp" "../loc/FSLineCounter.cpp" "Test_ExpandGlob.cpp" "../loc/ExpandGlob.cpp")
 
-target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain Boost::algorithm)
+target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS})
+target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain)
 
 include_directories("../loc")
 

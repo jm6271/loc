@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "boost-algorithm",
     "catch2",
     "cli11"
   ]
