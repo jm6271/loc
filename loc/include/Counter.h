@@ -2,9 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <queue>
 #include <thread>
-#include <mutex>
 #include <atomic>
 #include <filesystem>
 #include <fstream>
@@ -44,13 +42,12 @@ private:
     void expandAllGlobsInPaths(const std::vector<std::string>& paths_to_count);
 
     // multi-threading stuff
-    std::queue<std::string> file_queue{};
-
-    std::mutex file_queue_mutex{};
+    
+    std::atomic<size_t> next_index = 0;
 
     void CounterWorker();
 
-    bool GetNextPath(std::string& path);
+    void GetNextPaths(std::vector<std::string>& out_paths, int max_paths);
 
     std::atomic<unsigned long> total_lines{};
 };

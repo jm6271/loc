@@ -5,6 +5,7 @@
 #include "include/DirectoryScanner.h"
 #include <future>
 #include <iostream>
+#include <queue>
 #include "include/PyLineCounter.h"
 #include "include/FSLineCounter.h"
 #include "include/ExpandGlob.h"
@@ -24,13 +25,6 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 
     // go through the paths and expand glob patterns
     expandAllGlobsInPaths(this->paths);
-
-    // put the files to be counted in the queue
-    for (const auto& path : this->paths)
-    {
-        std::scoped_lock<std::mutex> lock(file_queue_mutex);
-        file_queue.push(path);
-    }
 }
 
 
@@ -41,13 +35,6 @@ Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std:
     // Get the paths to all the files that match the specified pattern, excluding files that match any patterns in ignorePatterns
     DirectoryScanner directorScanner{};
     paths = directorScanner.Scan(directoryPath, extensions);
-
-    // put the files to be counted in the queue
-    for (const auto& path : this->paths)
-    {
-        std::scoped_lock<std::mutex> lock(file_queue_mutex);
-        file_queue.push(path);
-    }
 }
 
 
@@ -60,14 +47,14 @@ Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std:
 unsigned long Counter::Count()
 {
     // Display the number of files that will be counted
-    std::cout << "Counting " << file_queue.size() << " files..." << std::endl;
+    std::cout << "Counting " << paths.size() << " files..." << std::endl;
 
     std::vector<std::jthread> threads;
 
-    // jobs contains the number of threads to start, but we want each thread to count at least 5 files
-    if (file_queue.size() < size_t(jobs * 5))
+    // jobs contains the number of threads to start, but we want each thread to count at least 10 files
+    if (paths.size() < size_t(jobs * 10))
     {
-        jobs = static_cast<unsigned int>( file_queue.size() / 5);
+        jobs = static_cast<unsigned int>( paths.size() / 10);
         if (jobs == 0)
         {
             jobs = 1;
@@ -225,27 +212,32 @@ void Counter::CounterWorker()
 {
     std::string path{};
 
-    while (GetNextPath(path))
+    while (next_index < paths.size())
     {
-        // count the lines of code in the file
-        unsigned long lines = CountFile(path);
+        // Get 5 paths to process
+        std::vector<std::string> paths_to_process{};
+        GetNextPaths(paths_to_process, 10);
 
-        // add to total
-        total_lines += lines;
+        for (const auto& current_path : paths_to_process)
+        {
+            // count the lines of code in the file
+            unsigned long lines = CountFile(current_path);
+
+            // add to total
+            total_lines += lines;
+        }
     }
 }
 
-bool Counter::GetNextPath(std::string& path)
+void Counter::GetNextPaths(std::vector<std::string>& out_paths, int max_paths)
 {
-    std::scoped_lock<std::mutex> lock(file_queue_mutex);
-
-    if (file_queue.empty())
+    for (int i = 0; i < max_paths; i++)
     {
-        return false;
+        size_t next = next_index.fetch_add(1, std::memory_order_relaxed);
+        if (next >= paths.size())
+            return;
+        out_paths.push_back(paths[next]);
     }
-    path = file_queue.front();
-    file_queue.pop();
-    return true;
 }
 
 void Counter::expandAllGlobsInPaths(const std::vector<std::string>& paths_to_expand)
