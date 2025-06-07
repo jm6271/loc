@@ -8,7 +8,6 @@ if (CMAKE_VERSION VERSION_GREATER 3.30)
     cmake_policy(SET CMP0167 NEW)
 endif()
 
-find_package(Boost REQUIRED COMPONENTS algorithm)
 find_package(CLI11 CONFIG REQUIRED)
 
 # Add source to this project's executable.
@@ -20,7 +19,7 @@ add_executable (loc "loc.cpp" "include/loc.h"
     "include/FSLineCounter.h" "FSLineCounter.cpp" "include/ExpandGlob.h" "ExpandGlob.cpp")
 
 target_include_directories(loc PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(loc PRIVATE Boost::algorithm CLI11::CLI11)
+target_link_libraries(loc PRIVATE CLI11::CLI11)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc PROPERTY CXX_STANDARD 20)
