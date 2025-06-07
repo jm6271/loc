@@ -24,7 +24,7 @@ void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
 	{
 		while (std::getline(file, line))
 		{
-			ltrim(line);
+			trim(line);
 			output.push_back(line);
 		}
 		file.close();
@@ -42,4 +42,19 @@ void FileReader::ltrim(std::string &s) {
             return std::isspace(ch);
         })
     );
+}
+
+void FileReader::rtrim(std::string& s) {
+	s.erase(
+		std::find_if_not(s.rbegin(), s.rend(), [](unsigned char ch) {
+			return std::isspace(ch);
+		}).base(),
+		s.end()
+	);
+}
+
+void FileReader::trim(std::string& s)
+{
+	ltrim(s);
+	rtrim(s);
 }
