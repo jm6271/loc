@@ -10,7 +10,7 @@
  * This function reads a file line-by-line and counts the number of lines of code.
  * It skips whitespace lines and single-line comments that start with '#'.
  */
-unsigned long PyLineCounter::CountLines(std::string& path)
+unsigned long PyLineCounter::CountLines(const std::string& path)
 {
     unsigned long totalLines{};
 

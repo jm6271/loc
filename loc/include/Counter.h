@@ -2,9 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <queue>
 #include <thread>
-#include <mutex>
 #include <atomic>
 #include <filesystem>
 #include <fstream>
@@ -16,7 +14,7 @@ class Counter
 public:
     Counter(unsigned int jobs, const std::vector<std::string>& paths);
 
-    Counter(unsigned int jobs, std::string& directoryPath, std::vector<std::string>& extensions);
+    Counter(unsigned int jobs, const std::string& directoryPath, const std::vector<std::string>& extensions);
 
     unsigned long Count();
 
@@ -26,7 +24,7 @@ private:
 
     bool IsDirectory(const std::filesystem::path& path) const;
 
-    unsigned long CountFile(std::string path);
+    unsigned long CountFile(const std::string& path) const;
 
     void normalizePath(std::string& path) const;
 
@@ -41,14 +39,15 @@ private:
 
     bool isFileInDirectory(const std::filesystem::path& parentDir, const std::filesystem::path& filePath) const;
 
-    void expandAllGlobsInPaths(std::vector<std::string>& paths);
+    void expandAllGlobsInPaths(const std::vector<std::string>& paths_to_count);
 
     // multi-threading stuff
-    std::queue<std::string> file_queue{};
-
-    std::mutex file_queue_mutex{};
+    
+    std::atomic<size_t> next_index = 0;
 
     void CounterWorker();
+
+    void GetNextPaths(std::vector<std::string>& out_paths, int max_paths);
 
     std::atomic<unsigned long> total_lines{};
 };

@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 		if (c_extensions)
 			extensions.insert(extensions.end(), C_EXTENSIONS.begin(), C_EXTENSIONS.end());
 
-		if (extensions.size() == 0)
+		if (extensions.empty())
 		{
 			cerr << "Error: No extensions specified\n";
 			return -1;

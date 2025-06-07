@@ -1,7 +1,8 @@
 #include "include/ExpandGlob.h"
 
 // Convert a simple glob (with * and ?) into a regex
-std::regex ExpandGlob::glob_to_regex(const std::string& glob) {
+std::regex ExpandGlob::glob_to_regex(const std::string& glob) const 
+{
     std::string re;
     re.reserve(glob.size() * 2);
     for (char c : glob) {
@@ -24,7 +25,7 @@ std::regex ExpandGlob::glob_to_regex(const std::string& glob) {
 
 // Expand one pattern, pushing each match into `out`.
 // Supports "**" in the directory part for recursion.
-void ExpandGlob::expand_glob(const std::string& pat, std::vector<std::string>& out) {
+void ExpandGlob::expand_glob(const std::string& pat, std::vector<std::string>& out) const {
     namespace fs = std::filesystem;
 
     fs::path p{ pat };

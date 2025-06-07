@@ -15,7 +15,7 @@
  * before adding it to the vector. If the file cannot be opened, an error message
  * is printed to the standard error stream.
  */
-void FileReader::ReadFile(std::string path, std::vector<std::string>& output)
+void FileReader::ReadFile(const std::string& path, std::vector<std::string>& output)
 {
 	std::ifstream file{ path };
 	std::string line{};

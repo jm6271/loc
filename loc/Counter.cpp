@@ -5,6 +5,7 @@
 #include "include/DirectoryScanner.h"
 #include <future>
 #include <iostream>
+#include <queue>
 #include "include/PyLineCounter.h"
 #include "include/FSLineCounter.h"
 #include "include/ExpandGlob.h"
@@ -24,30 +25,16 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 
     // go through the paths and expand glob patterns
     expandAllGlobsInPaths(this->paths);
-
-    // put the files to be counted in the queue
-    for (const auto& path : this->paths)
-    {
-        std::scoped_lock<std::mutex> lock(file_queue_mutex);
-        file_queue.push(path);
-    }
 }
 
 
-Counter::Counter(unsigned int jobs, std::string &directoryPath, std::vector<std::string>& extensions)
+Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std::vector<std::string>& extensions)
 {
     this->jobs = jobs;
 
     // Get the paths to all the files that match the specified pattern, excluding files that match any patterns in ignorePatterns
     DirectoryScanner directorScanner{};
     paths = directorScanner.Scan(directoryPath, extensions);
-
-    // put the files to be counted in the queue
-    for (const auto& path : this->paths)
-    {
-        std::scoped_lock<std::mutex> lock(file_queue_mutex);
-        file_queue.push(path);
-    }
 }
 
 
@@ -60,14 +47,14 @@ Counter::Counter(unsigned int jobs, std::string &directoryPath, std::vector<std:
 unsigned long Counter::Count()
 {
     // Display the number of files that will be counted
-    std::cout << "Counting " << file_queue.size() << " files..." << std::endl;
+    std::cout << "Counting " << paths.size() << " files..." << std::endl;
 
     std::vector<std::jthread> threads;
 
-    // jobs contains the number of threads to start, but we want each thread to count at least 5 files
-    if (file_queue.size() < jobs * 5)
+    // jobs contains the number of threads to start, but we want each thread to count at least 10 files
+    if (paths.size() < size_t(jobs * 10))
     {
-        jobs = static_cast<unsigned int>( file_queue.size() / 5);
+        jobs = static_cast<unsigned int>( paths.size() / 10);
         if (jobs == 0)
         {
             jobs = 1;
@@ -124,7 +111,7 @@ void Counter::normalizePath(std::string& path) const
  * @return The number of lines in the file.
  *         Returns 0 if the file type is not yet supported.
  */
-unsigned long Counter::CountFile(std::string path)
+unsigned long Counter::CountFile(const std::string& path) const
 {
     // Get the file language
     FILE_LANGUAGE language = GetFileLanguage(path);
@@ -223,36 +210,42 @@ bool Counter::isFileInDirectory(const std::filesystem::path& parentDir, const st
  */
 void Counter::CounterWorker()
 {
-    while (true)
+    std::string path{};
+
+    while (next_index < paths.size())
     {
-        // get a path off the queue
-        std::string path{};
+        // Get 5 paths to process
+        std::vector<std::string> paths_to_process{};
+        GetNextPaths(paths_to_process, 10);
+
+        for (const auto& current_path : paths_to_process)
         {
-            std::scoped_lock<std::mutex> lock(file_queue_mutex);
-            
-            if (file_queue.size() == 0)
-            {
-                return;
-            }
-            path = file_queue.front();
-            file_queue.pop();          
+            // count the lines of code in the file
+            unsigned long lines = CountFile(current_path);
+
+            // add to total
+            total_lines += lines;
         }
-
-
-        // count the lines of code in the file
-        unsigned long lines = CountFile(path);
-
-        // add to total
-        total_lines += lines;
     }
 }
 
-void Counter::expandAllGlobsInPaths(std::vector<std::string>& paths)
+void Counter::GetNextPaths(std::vector<std::string>& out_paths, int max_paths)
 {
-    std::vector<std::string> copyVector = paths;
+    for (int i = 0; i < max_paths; i++)
+    {
+        size_t next = next_index.fetch_add(1, std::memory_order_relaxed);
+        if (next >= paths.size())
+            return;
+        out_paths.push_back(paths[next]);
+    }
+}
+
+void Counter::expandAllGlobsInPaths(const std::vector<std::string>& paths_to_expand)
+{
+    std::vector<std::string> copyVector = paths_to_expand;
     paths.clear();
 
-    for (auto& path : copyVector)
+    for (auto const& path : copyVector)
     {
         // run glob on the path
         ExpandGlob expander{};

@@ -9,7 +9,7 @@
  * This function reads a file line-by-line and counts the number of lines of code.
  * It skips whitespace lines and 1 line comments.
  */
-unsigned long CLineCounter::CountLines(std::string& path)
+unsigned long CLineCounter::CountLines(const std::string& path)
 {
 	unsigned long totalLines{};
 
