@@ -15,6 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project ("loc")
 
+enable_testing()
+
 # Include sub-projects.
 add_subdirectory ("loc")
 add_subdirectory("loc.tests")
