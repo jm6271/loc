@@ -31,9 +31,7 @@ jobs:
       run: |
         cd out/build/x64-release
         ninja
-        cd loc.tests
-        ./loc.tests
-        cd ../../../..
+        ctest
 
     - name: Create zip file
       run: powershell Compress-Archive -Path out\build\x64-release\loc\loc.exe,out\build\x64-release\loc\*.dll -DestinationPath out\build\x64-release\loc-windows-x64.zip
@@ -65,9 +63,8 @@ jobs:
     
     - name: Run tests
       run: |
-        cd out/build/linux-release/loc.tests
-        ./loc.tests
-        cd ../../../..
+        cd out/build/linux-release/
+        ctest
 
     - name: Create zip file
       run: zip -j out/build/linux-release/loc-linux-x64.zip out/build/linux-release/loc/loc out/build/linux-release/loc/*.so.*
