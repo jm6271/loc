@@ -60,20 +60,23 @@ cd loc
 # setup vcpkg
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
-./bootstrap-vcpkg..sh
+./bootstrap-vcpkg.sh
 cd ..
 export VCPKG_ROOT=$(pwd)/vcpkg
 export PATH=${VCPKG_ROOT}:${PATH}
 
-# Create build directory and configure
-mkdir -p build
-cd build
-cmake --preset=linux-release ..
+# configure
+cmake --preset=linux-release .
 
 # Build the project
-cd ../out/build/linux-release
+cd out/build/linux-release
 ninja
-cd ../../..
+
+# Run the tests
+cd loc.tests
+./loc.tests
+
+# release binary is located at out/build/linux-release/loc/loc
 ```
 
 ## Usage
