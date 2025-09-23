@@ -36,6 +36,8 @@ int main(int argc, char** argv)
 	bool py_extensions = false;
 	bool fs_extensions = false;
 	bool c_extensions = false;
+	bool include_generated = false;
+	vector<string> ignore_dirs{};
 
 	directory_command->add_flag("--cpp", cpp_extensions, "Use C++ extensions (.cpp, .h, .hpp, .cxx, .hxx, .c++, .cc)")
 		->capture_default_str()
@@ -54,6 +56,10 @@ int main(int argc, char** argv)
 		->default_val(false);
 
 	directory_command->add_option("-e,--extention", extensions, "Extensions of files to count");
+	directory_command->add_flag("--include-generated", include_generated, "Include generated files in directories like obj/, out/, .git/, and bin/")
+		->capture_default_str()
+		->default_val(false);
+	directory_command->add_option("-i,--ignore", ignore_dirs, "Directories to ignore (relative to the provided directory)");
 	directory_command->add_option("directory", directory_path, "Directory to search")
 		->required()
 		->expected(1);
@@ -89,7 +95,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		Counter counter(jobs, directory_path, extensions);
+		Counter counter(jobs, directory_path, extensions, include_generated, ignore_dirs);
 		auto lines = counter.Count();
 		
 		cout << "Counted " << lines << " lines of code";

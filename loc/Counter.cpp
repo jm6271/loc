@@ -28,13 +28,23 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 }
 
 
-Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std::vector<std::string>& extensions)
+Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std::vector<std::string>& extensions,
+                 bool includeGenerated, const std::vector<std::string>& ignoreDirs)
 {
     this->jobs = jobs;
 
-    // Get the paths to all the files that match the specified pattern, excluding files that match any patterns in ignorePatterns
     DirectoryScanner directorScanner{};
-    paths = directorScanner.Scan(directoryPath, extensions);
+
+    // Create a complete list of directories to ignore
+    std::vector<std::string> ignore = ignoreDirs;
+    if (!includeGenerated)
+    {
+        auto generatedDirs = directorScanner.FindIgnoredDirectories(directoryPath, { "obj", "out", ".git", "bin" });
+        ignore.insert(ignore.end(), generatedDirs.begin(), generatedDirs.end());
+    }
+
+    // Get the paths to all the files that match the specified pattern, excluding files in ignored directories
+    paths = directorScanner.Scan(directoryPath, extensions, ignore);
 }
 
 

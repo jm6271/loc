@@ -19,7 +19,7 @@ TEST_CASE("Test DirectoryScanner")
 
     // Actual data
     std::vector<std::string> actual{};
-    actual = scanner.Scan(test_dir, {".cpp", ".py", ".h"});
+    actual = scanner.Scan(test_dir, {".cpp", ".py", ".h"}, {});
 
     // Check if the actual data matches the expected data
     // Sort the vectors first to make sure items are in the same order

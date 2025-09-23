@@ -14,7 +14,8 @@ class Counter
 public:
     Counter(unsigned int jobs, const std::vector<std::string>& paths);
 
-    Counter(unsigned int jobs, const std::string& directoryPath, const std::vector<std::string>& extensions);
+    Counter(unsigned int jobs, const std::string& directoryPath, const std::vector<std::string>& extensions,
+            bool includeGenerated, const std::vector<std::string>& ignoreDirs);
 
     unsigned long Count();
 

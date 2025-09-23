@@ -10,5 +10,11 @@ class DirectoryScanner
 public:
     DirectoryScanner() = default;
 
-    std::vector<std::string> Scan(const std::filesystem::path& directory, const std::vector<std::string>& extensions) const;
+    std::vector<std::string> Scan(const std::filesystem::path& directory, const std::vector<std::string>& extensions,
+        const std::vector<std::string>& ignoreDirs) const;
+
+    std::vector<std::string> FindIgnoredDirectories(const std::filesystem::path& directory, const std::vector<std::string>& ignorePatterns) const;
+
+private:
+    void RemoveIgnoredFiles(std::vector<std::string>& filePaths, const std::vector<std::string>& ignoreDirs) const;
 };
