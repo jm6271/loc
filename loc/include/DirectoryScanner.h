@@ -16,5 +16,5 @@ public:
     std::vector<std::string> FindIgnoredDirectories(const std::filesystem::path& directory, const std::vector<std::string>& ignorePatterns) const;
 
 private:
-    void RemoveIgnoredFiles(std::vector<std::string>& filePaths, const std::vector<std::string>& ignoreDirs) const;
+    bool isSubPath(const std::filesystem::path& base, const std::filesystem::path& path) const;
 };
