@@ -1,5 +1,6 @@
 #include "include/DirectoryScanner.h"
 #include <iostream>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
