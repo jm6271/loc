@@ -106,18 +106,22 @@ Usage: ```loc [options] dir [options] directory```
 
 Options:
 
-```--cpp``` Search for files with C++ extensions
+`--cpp` Search for files with C++ extensions
 
-```--cs``` Search for files with C# extensions
+`--cs` Search for files with C# extensions
 
-```--py``` Search for files with Python extensions
+`--py` Search for files with Python extensions
 
-```--fs``` Search for files with F# extensions
+`--fs` Search for files with F# extensions
 
-  ```--c``` Search for files with C extensions
+`--c` Search for files with C extensions
 
-  ```-e,--extention TEXT ...```  Other extensions to pass in.
-  For example: ```loc dir -e .cpp -e .h .```
+`-e,--extention TEXT ...`  Other extensions to pass in.
+For example: `loc dir -e .cpp -e .h .`
+
+`-i,--ignore TEXT ...` Directories to ignore (relative to the provided directory to search)
+
+`--include-generated` Include build files and generated files in directories like `obj/`, `out/`, `.git/`, and `bin/`
 
 ### Example
 
