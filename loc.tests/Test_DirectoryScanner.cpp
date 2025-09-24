@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include "include/DirectoryScanner.h"
 #include <algorithm>
+#include <filesystem>
 
 TEST_CASE("Test DirectoryScanner")
 {
@@ -10,7 +11,7 @@ TEST_CASE("Test DirectoryScanner")
     auto test_dir = std::string(TEST_DATA_DIR);
 
     // Expected data
-    std::vector<std::string> expected{};
+    std::vector<std::filesystem::path> expected{};
 
     expected.push_back(test_dir + "/py_file.py");
     expected.push_back(test_dir + "/cpp_file.cpp");
@@ -18,7 +19,7 @@ TEST_CASE("Test DirectoryScanner")
     expected.push_back(test_dir + "/header.h");
 
     // Actual data
-    std::vector<std::string> actual{};
+    std::vector<std::filesystem::path> actual{};
     actual = scanner.Scan(test_dir, {".cpp", ".py", ".h"}, {});
 
     // Check if the actual data matches the expected data
@@ -29,12 +30,14 @@ TEST_CASE("Test DirectoryScanner")
     // Normalize path separater character to '/'
     for (auto& path : actual)
     {
-        std::replace(path.begin(), path.end(), '\\', '/');
+        //std::replace(path.begin(), path.end(), '\\', '/');
+        path.make_preferred();
     }
 
     for (auto& path : expected)
     {
-        std::replace(path.begin(), path.end(), '\\', '/');
+        //std::replace(path.begin(), path.end(), '\\', '/');
+		path.make_preferred();
     }
 
     REQUIRE(actual == expected);

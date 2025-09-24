@@ -1,5 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include "include/ExpandGlob.h"
+#include <filesystem>
 
 TEST_CASE("Glob expands correctly")
 {
@@ -7,13 +8,13 @@ TEST_CASE("Glob expands correctly")
     auto test_dir = std::string(TEST_DATA_DIR);
 
     // Expected data
-    std::vector<std::string> expected{};
+    std::vector<std::filesystem::path> expected{};
 
     expected.push_back(test_dir + "/cpp_file2.cpp");
     expected.push_back(test_dir + "/cpp_file.cpp");
 
     // Actual data
-    std::vector<std::string> actual{};
+    std::vector<std::filesystem::path> actual{};
 
     // Act
     ExpandGlob expander{};
@@ -26,12 +27,12 @@ TEST_CASE("Glob expands correctly")
     // Normalize path separater character to '/'
     for (auto& path : actual)
     {
-        std::replace(path.begin(), path.end(), '\\', '/');
+        path.make_preferred();
     }
 
     for (auto& path : expected)
     {
-        std::replace(path.begin(), path.end(), '\\', '/');
+		path.make_preferred();
     }
 
     // Assert

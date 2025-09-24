@@ -25,12 +25,11 @@ std::regex ExpandGlob::glob_to_regex(const std::string& glob) const
 
 // Expand one pattern, pushing each match into `out`.
 // Supports "**" in the directory part for recursion.
-void ExpandGlob::expand_glob(const std::string& pat, std::vector<std::string>& out) const {
+void ExpandGlob::expand_glob(const std::filesystem::path& pattern, std::vector<std::filesystem::path>& out) const {
     namespace fs = std::filesystem;
 
-    fs::path p{ pat };
-    auto parent = p.parent_path().string();
-    auto filename = p.filename().string();
+    auto parent = pattern.parent_path().string();
+    auto filename = pattern.filename().string();
 
     bool recursive = false;
     fs::path base_dir = parent.empty() ? "." : parent;
@@ -52,14 +51,14 @@ void ExpandGlob::expand_glob(const std::string& pat, std::vector<std::string>& o
         for (auto& entry : fs::recursive_directory_iterator(base_dir)) {
             if (!entry.is_regular_file()) continue;
             if (std::regex_match(entry.path().filename().string(), rex))
-                out.push_back(fs::weakly_canonical(entry.path()).string());
+                out.emplace_back(entry.path());
         }
     }
     else {
         for (auto& entry : fs::directory_iterator(base_dir)) {
             if (!entry.is_regular_file()) continue;
             if (std::regex_match(entry.path().filename().string(), rex))
-                out.push_back(fs::weakly_canonical(entry.path()).string());
+                out.emplace_back(entry.path());
         }
     }
 }
