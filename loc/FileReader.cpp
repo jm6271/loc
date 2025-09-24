@@ -17,44 +17,42 @@
  */
 void FileReader::ReadFile(const std::filesystem::path& path, std::vector<std::string>& output)
 {
-	std::ifstream file{ path };
-	std::string line{};
+    std::ifstream file{ path };
+    if (!file.is_open()) {
+        std::cerr << "Error: unable to open file: " << path << "\n";
+        return;
+    }
 
-	if (file.is_open())
-	{
-		while (std::getline(file, line))
-		{
-			trim(line);
-			output.push_back(line);
-		}
-		file.close();
+	output.reserve(1000);  // Reserve space for typical file line count
+
+    std::string line;
+    line.reserve(256);  // Reserve space for typical line length
+
+    while (std::getline(file, line))
+    {
+        auto trimmed = trim(line);
+        if (!trimmed.empty()) {  // Skip empty lines if desired
+            output.emplace_back(trimmed);
+        }
+    }
+}
+
+std::string_view FileReader::trim(const std::string& s) {
+	if (s.empty()) return std::string_view(s);
+
+	const char* data = s.data();
+	size_t size = s.size();
+	size_t start = 0;
+
+	// Find first non-whitespace
+	while (start < size && is_whitespace[static_cast<unsigned char>(data[start])]) {
+		++start;
 	}
-	else
-	{
-		std::cerr << "Error: unable to open file: " << path << "\n";
+
+	// Find last non-whitespace
+	while (size > start && is_whitespace[static_cast<unsigned char>(data[size - 1])]) {
+		--size;
 	}
-}
 
-void FileReader::ltrim(std::string &s) {
-    s.erase(
-        s.begin(),
-        std::find_if_not(s.begin(), s.end(), [](unsigned char ch) {
-            return std::isspace(ch);
-        })
-    );
-}
-
-void FileReader::rtrim(std::string& s) {
-	s.erase(
-		std::find_if_not(s.rbegin(), s.rend(), [](unsigned char ch) {
-			return std::isspace(ch);
-		}).base(),
-		s.end()
-	);
-}
-
-void FileReader::trim(std::string& s)
-{
-	ltrim(s);
-	rtrim(s);
+	return std::string_view(data + start, size - start);
 }
