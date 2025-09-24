@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 	}
 	else if (version)
 	{
-		cout << "loc version 1.4.0\n";
+		cout << "loc version 1.4.1\n";
 		return 0;
 	}
 	else
