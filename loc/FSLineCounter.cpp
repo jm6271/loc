@@ -9,7 +9,7 @@
  * This function reads a file line-by-line and counts the number of lines of code.
  * It skips whitespace lines and 1 line comments.
  */
-unsigned long FSLineCounter::CountLines(const std::string& path)
+unsigned long FSLineCounter::CountLines(const std::filesystem::path& path)
 {
 	unsigned long totalLines{};
 

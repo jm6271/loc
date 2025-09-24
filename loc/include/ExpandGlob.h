@@ -9,7 +9,7 @@
 class ExpandGlob
 {
 public:
-	void expand_glob(const std::string& pat, std::vector<std::string>& out) const;
+	void expand_glob(const std::filesystem::path& patttern, std::vector<std::filesystem::path>& out) const;
 private:
 	std::regex glob_to_regex(const std::string& glob) const;
 };

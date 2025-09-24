@@ -10,10 +10,10 @@ namespace fs = std::filesystem;
 * @param extensions the extensions to look for
 * @return a list of paths to the files found
 */
-std::vector<std::string> DirectoryScanner::Scan(const fs::path& directory, const std::vector<std::string>& extensions,
-                                                const std::vector<std::string>& ignoreDirs) const
+std::vector<fs::path> DirectoryScanner::Scan(const fs::path& directory, const std::vector<std::string>& extensions,
+                                                const std::vector<fs::path>& ignoreDirs) const
 {
-    std::vector<std::string> result;
+    std::vector<fs::path> result;
 
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
         return result;
@@ -22,19 +22,18 @@ std::vector<std::string> DirectoryScanner::Scan(const fs::path& directory, const
     // Normalize ignore directories into absolute canonical paths
     std::vector<fs::path> ignorePaths;
     for (const auto& dir : ignoreDirs) {
-        fs::path p(dir);
-        if (p.is_absolute()) {
-            ignorePaths.push_back(fs::weakly_canonical(p));
+        if (dir.is_absolute()) {
+            ignorePaths.push_back(fs::weakly_canonical(dir));
         } else {
-            ignorePaths.push_back(fs::weakly_canonical(directory / p));
+            ignorePaths.push_back(fs::weakly_canonical(directory / dir));
         }
     }
 
-    fs::recursive_directory_iterator it(directory), end;
+    fs::recursive_directory_iterator it(directory);
+    fs::recursive_directory_iterator end;
     while (it != end) {
-        const fs::directory_entry& entry = *it;
 
-        if (entry.is_directory()) {
+        if (const fs::directory_entry& entry = *it; entry.is_directory()) {
             fs::path current = fs::weakly_canonical(entry.path());
 
             // Skip if inside any ignored directory
@@ -51,7 +50,7 @@ std::vector<std::string> DirectoryScanner::Scan(const fs::path& directory, const
             std::string ext = entry.path().extension().string();
 
             if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
-                result.push_back(entry.path().string());
+                result.push_back(entry.path());
             }
         }
 
@@ -61,9 +60,9 @@ std::vector<std::string> DirectoryScanner::Scan(const fs::path& directory, const
     return result;
 }
 
-std::vector<std::string> DirectoryScanner::FindIgnoredDirectories(const std::filesystem::path &directory, const std::vector<std::string> &ignorePatterns) const
+std::vector<fs::path> DirectoryScanner::FindIgnoredDirectories(const std::filesystem::path &directory, const std::vector<std::string> &ignorePatterns) const
 {
-    std::vector<std::string> ignoredDirectories;
+    std::vector<fs::path> ignoredDirectories;
 
     if (fs::exists(directory) && fs::is_directory(directory))
     {
@@ -74,19 +73,9 @@ std::vector<std::string> DirectoryScanner::FindIgnoredDirectories(const std::fil
                 // Check if the directory name matches any of the ignore patterns
                 for (const auto& pattern : ignorePatterns)
                 {
-                    if (entry.path().filename().string() == pattern)
+                    if (entry.path().filename() == pattern)
                     {
-                        try
-                        {
-                            ignoredDirectories.push_back(entry.path().string());
-                        }
-                        catch(const std::system_error& e)
-                        {
-                            // Ignore the directory and print a warning
-                            std::cerr << "Warning: System error thrown while getting a directory path. Skipping directory.\n";
-                            std::cerr << "Error message: " << e.what() << '\n';
-                            continue;
-                        }
+                        ignoredDirectories.push_back(entry.path());
                         break; // No need to check other patterns for this directory
                     }
                 }

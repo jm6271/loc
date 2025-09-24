@@ -3,7 +3,7 @@
 #pragma once
 
 #include <vector>
-#include <string>
+#include <filesystem>
 
 
 class ILineCounter
@@ -13,7 +13,7 @@ public:
 	/// Count the lines of code in the given file
 	/// </summary>
 	/// <returns>The number of lines </returns>
-	virtual unsigned long CountLines(const std::string& path) = 0;
+	virtual unsigned long CountLines(const std::filesystem::path& path) = 0;
 
 	virtual ~ILineCounter() = default;
 };

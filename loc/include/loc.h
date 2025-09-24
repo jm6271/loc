@@ -9,6 +9,7 @@
 #include <vector>
 #include <chrono>
 #include <locale>
+#include <filesystem>
 
 #include <CLI/CLI.hpp>
 

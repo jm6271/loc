@@ -5,5 +5,5 @@
 class PyLineCounter : public ILineCounter
 {
 public:
-    unsigned long CountLines(const std::string& path) override;
+    unsigned long CountLines(const std::filesystem::path& path) override;
 };

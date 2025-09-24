@@ -1,6 +1,7 @@
 ﻿#include "include/loc.h"
 
 using namespace std;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv)
 {
@@ -21,7 +22,7 @@ int main(int argc, char** argv)
 
 	// files command
 	auto files_command = app.add_subcommand("files", "Count lines of code in one or more files");
-	vector<string> input_files{};
+	vector<fs::path> input_files{};
 	files_command->add_option("paths", input_files, "List of paths to files to count")
 		->required()
 		->expected(1, -1);
@@ -29,7 +30,7 @@ int main(int argc, char** argv)
 	
 	// directory command
 	auto directory_command = app.add_subcommand("dir", "Count lines of code in files with provided extensions in a directory");
-	string directory_path{};
+	fs::path directory_path{};
 	vector<string> extensions{};
 	bool cpp_extensions = false;
 	bool cs_extensions = false;
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
 	bool fs_extensions = false;
 	bool c_extensions = false;
 	bool include_generated = false;
-	vector<string> ignore_dirs{};
+	vector<fs::path> ignore_dirs{};
 
 	directory_command->add_flag("--cpp", cpp_extensions, "Use C++ extensions (.cpp, .h, .hpp, .cxx, .hxx, .c++, .cc)")
 		->capture_default_str()

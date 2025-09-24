@@ -18,7 +18,7 @@
  * This constructor initializes the Counter object and starts the threads for counting. The
  * threads are started after the constructor is finished.
  */
-Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
+Counter::Counter(unsigned int jobs, const std::vector<std::filesystem::path>& paths)
 {
     this->jobs = jobs;
     this->paths = paths;
@@ -28,15 +28,15 @@ Counter::Counter(unsigned int jobs, const std::vector<std::string>& paths)
 }
 
 
-Counter::Counter(unsigned int jobs, const std::string &directoryPath, const std::vector<std::string>& extensions,
-                 bool includeGenerated, const std::vector<std::string>& ignoreDirs)
+Counter::Counter(unsigned int jobs, const std::filesystem::path &directoryPath, const std::vector<std::string>& extensions,
+                 bool includeGenerated, const std::vector<std::filesystem::path>& ignoreDirs)
 {
     this->jobs = jobs;
 
     DirectoryScanner directorScanner{};
 
     // Create a complete list of directories to ignore
-    std::vector<std::string> ignore = ignoreDirs;
+    std::vector<std::filesystem::path> ignore = ignoreDirs;
     if (!includeGenerated)
     {
         auto generatedDirs = directorScanner.FindIgnoredDirectories(directoryPath, { "obj", "out", ".git", "bin" });
@@ -99,19 +99,6 @@ bool Counter::IsDirectory(const std::filesystem::path& path) const
 }
 
 /**
- * Normalize a path by replacing all occurances of the other slash type with the native slash type.
- * @param path The path to normalize.
- * 
- * This function is used to ensure that all paths are represented in the same way, regardless of the
- * OS. It is used to normalize the paths in the ignore list and the paths of the files to be counted.
- */
-void Counter::normalizePath(std::string& path) const 
-{ 
-    std::filesystem::path p {path};
-    path = p.make_preferred().string();
-}
-
-/**
  * Count the number of lines in a file specified by the given path.
  * Determines the programming language of the file and utilizes
  * the appropriate line counting mechanism for that language.
@@ -121,7 +108,7 @@ void Counter::normalizePath(std::string& path) const
  * @return The number of lines in the file.
  *         Returns 0 if the file type is not yet supported.
  */
-unsigned long Counter::CountFile(const std::string& path) const
+unsigned long Counter::CountFile(const std::filesystem::path& path) const
 {
     // Get the file language
     FILE_LANGUAGE language = GetFileLanguage(path);
@@ -155,14 +142,13 @@ unsigned long Counter::CountFile(const std::string& path) const
  * @param path The file path to be analyzed.
  * @return The type of file language.
  */
-Counter::FILE_LANGUAGE Counter::GetFileLanguage(const std::string& path) const
+Counter::FILE_LANGUAGE Counter::GetFileLanguage(const std::filesystem::path& path) const
 {
     // if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then return C
     // if the path ends with .py or .pyw then return Python
     // if the path ends with .fs or .fsx then return FSharp
 
-    std::filesystem::path p{ path };
-    std::string extension = p.extension().string();
+    std::string extension = path.extension().string();
 
     if (extension == ".py" || extension == ".pyw")
     {
@@ -224,8 +210,8 @@ void Counter::CounterWorker()
 
     while (next_index < paths.size())
     {
-        // Get 5 paths to process
-        std::vector<std::string> paths_to_process{};
+        // Get 10 paths to process
+        std::vector<std::filesystem::path> paths_to_process{};
         GetNextPaths(paths_to_process, 10);
 
         for (const auto& current_path : paths_to_process)
@@ -239,7 +225,7 @@ void Counter::CounterWorker()
     }
 }
 
-void Counter::GetNextPaths(std::vector<std::string>& out_paths, int max_paths)
+void Counter::GetNextPaths(std::vector<std::filesystem::path>& out_paths, int max_paths)
 {
     for (int i = 0; i < max_paths; i++)
     {
@@ -250,9 +236,9 @@ void Counter::GetNextPaths(std::vector<std::string>& out_paths, int max_paths)
     }
 }
 
-void Counter::expandAllGlobsInPaths(const std::vector<std::string>& paths_to_expand)
+void Counter::expandAllGlobsInPaths(const std::vector<std::filesystem::path>& paths_to_expand)
 {
-    std::vector<std::string> copyVector = paths_to_expand;
+    std::vector<std::filesystem::path> copyVector = paths_to_expand;
     paths.clear();
 
     for (auto const& path : copyVector)
