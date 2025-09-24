@@ -20,12 +20,15 @@ std::vector<fs::path> DirectoryScanner::Scan(const fs::path& directory, const st
 
     // Normalize ignore directories into absolute canonical paths
     std::vector<fs::path> ignorePaths;
-    for (const auto& dir : ignoreDirs) {
-        if (dir.is_absolute()) {
-            ignorePaths.push_back(fs::weakly_canonical(dir));
-        }
-        else {
-            ignorePaths.push_back(fs::weakly_canonical(directory / dir));
+    if (!ignoreDirs.empty())
+    {
+        for (const auto& dir : ignoreDirs) {
+            if (dir.is_absolute()) {
+                ignorePaths.push_back(fs::weakly_canonical(dir));
+            }
+            else {
+                ignorePaths.push_back(fs::weakly_canonical(directory / dir));
+            }
         }
     }
 
