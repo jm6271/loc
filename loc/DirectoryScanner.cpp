@@ -11,55 +11,49 @@ namespace fs = std::filesystem;
 * @return a list of paths to the files found
 */
 std::vector<fs::path> DirectoryScanner::Scan(const fs::path& directory, const std::vector<std::string>& extensions,
-                                                const std::vector<fs::path>& ignoreDirs) const
+    const std::vector<fs::path>& ignoreDirs) const
 {
     std::vector<fs::path> result;
-
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
         return result;
     }
 
     // Normalize ignore directories into absolute canonical paths
     std::vector<fs::path> ignorePaths;
-    if (!ignoreDirs.empty())
-    {
-        for (const auto& dir : ignoreDirs) {
-            if (dir.is_absolute()) {
-                ignorePaths.push_back(fs::weakly_canonical(dir));
-            } else {
-                ignorePaths.push_back(fs::weakly_canonical(directory / dir));
-            }
+    for (const auto& dir : ignoreDirs) {
+        if (dir.is_absolute()) {
+            ignorePaths.push_back(fs::weakly_canonical(dir));
+        }
+        else {
+            ignorePaths.push_back(fs::weakly_canonical(directory / dir));
         }
     }
 
     fs::recursive_directory_iterator it(directory);
     fs::recursive_directory_iterator end;
+
     while (it != end) {
+        const fs::directory_entry& entry = *it;
 
-        if (const fs::directory_entry& entry = *it; entry.is_directory() && ignorePaths.empty()) {
+        if (entry.is_directory() && !ignorePaths.empty()) {
             fs::path current = fs::weakly_canonical(entry.path());
-
             // Skip if inside any ignored directory
             bool skip = std::any_of(ignorePaths.begin(), ignorePaths.end(),
-                                    [&](const fs::path& ignore) {
-                                        return isSubPath(ignore, current);
-                                    });
-
+                [&](const fs::path& ignore) {
+                    return isSubPath(ignore, current);
+                });
             if (skip) {
-                it.disable_recursion_pending(); // skip this whole subtree
+                it.disable_recursion_pending();
             }
-        } 
+        }
         else if (entry.is_regular_file()) {
             std::string ext = entry.path().extension().string();
-
             if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
                 result.push_back(entry.path());
             }
         }
-
         ++it;
     }
-
     return result;
 }
 
