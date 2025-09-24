@@ -20,6 +20,11 @@ int main(int argc, char** argv)
 		->capture_default_str()
 		->default_val(jobs);
 
+	bool version = false;
+	app.add_flag("--version", version, "Print the version number and exit")
+		->capture_default_str()
+		->default_val(false);
+
 	// files command
 	auto files_command = app.add_subcommand("files", "Count lines of code in one or more files");
 	vector<fs::path> input_files{};
@@ -100,6 +105,11 @@ int main(int argc, char** argv)
 		auto lines = counter.Count();
 		
 		cout << "Counted " << lines << " lines of code";
+	}
+	else if (version)
+	{
+		cout << "loc version 1.4.0\n";
+		return 0;
 	}
 	else
 	{
