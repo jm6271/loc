@@ -143,4 +143,4 @@ loc -j 10 dir --cpp .
 ```loc``` is designed to be as fast as possible using multi-threading.
 
 Counting the total lines of code in the Boost C++ libraries
-(over 4 million lines of code) takes about 2.08 seconds on 12 cores.
+(over 4 million lines of code) takes about 2.5 seconds on 12 cores.
