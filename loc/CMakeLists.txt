@@ -20,6 +20,7 @@ target_sources(Filesystem
       src/loc.Filesystem/loc.Filesystem.ixx
       src/loc.Filesystem/DirectoryScanner.ixx
       src/loc.Filesystem/ExpandGlob.ixx
+      src/loc.Filesystem/FileReader.ixx
 )
 
 # Main executable
@@ -29,8 +30,6 @@ add_executable(loc
   include/ILineCounter.h
   include/CLineCounter.h
   CLineCounter.cpp
-  include/FileReader.h
-  FileReader.cpp
   include/Counter.h
   Counter.cpp
   PyLineCounter.cpp

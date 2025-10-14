@@ -1,5 +1,6 @@
 #include "include/PyLineCounter.h"
-#include "include/FileReader.h"
+
+import loc.Filesystem;
 
 /**
  * Count the number of lines of code in a Python file.

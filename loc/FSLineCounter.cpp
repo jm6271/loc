@@ -1,5 +1,6 @@
 #include "include/FSLineCounter.h"
-#include "include/FileReader.h"
+
+import loc.Filesystem;
 
 /**
  * Count the number of lines of code in the given file
