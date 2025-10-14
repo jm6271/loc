@@ -2,13 +2,14 @@
 #include "include/CLineCounter.h"
 #include <sstream>
 #include <filesystem>
-#include "include/DirectoryScanner.h"
 #include <future>
 #include <iostream>
 #include <queue>
 #include "include/PyLineCounter.h"
 #include "include/FSLineCounter.h"
 #include "include/ExpandGlob.h"
+
+import Filesystem;
 
 /**
  * Constructor for the Counter class.
