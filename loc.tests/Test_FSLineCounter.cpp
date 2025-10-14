@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "include/FSLineCounter.h"
+import loc.Counter;
 
 TEST_CASE("Count lines in a F# file")
 {

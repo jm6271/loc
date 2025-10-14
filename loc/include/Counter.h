@@ -7,7 +7,6 @@
 #include <filesystem>
 #include <fstream>
 
-#include "ILineCounter.h"
 
 class Counter
 {

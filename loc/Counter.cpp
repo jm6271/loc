@@ -1,14 +1,12 @@
 #include "include/Counter.h"
-#include "include/CLineCounter.h"
 #include <sstream>
 #include <filesystem>
 #include <future>
 #include <iostream>
 #include <queue>
-#include "include/PyLineCounter.h"
-#include "include/FSLineCounter.h"
 
 import loc.Filesystem;
+import loc.Counter;
 
 /**
  * Constructor for the Counter class.

@@ -13,8 +13,8 @@ endif()
 find_package(CLI11 CONFIG REQUIRED)
 
 # Filesystem module target
-add_library(Filesystem STATIC)
-target_sources(Filesystem
+add_library(loc.Filesystem STATIC)
+target_sources(loc.Filesystem
   PUBLIC
     FILE_SET CXX_MODULES FILES
       src/loc.Filesystem/loc.Filesystem.ixx
@@ -23,22 +23,27 @@ target_sources(Filesystem
       src/loc.Filesystem/FileReader.ixx
 )
 
+# Counter module target
+add_library(loc.Counter STATIC)
+target_sources(loc.Counter
+  PUBLIC
+    FILE_SET CXX_MODULES FILES
+      src/loc.Counter/loc.Counter.ixx
+      src/loc.Counter/CLineCounter.ixx
+      src/loc.Counter/PyLineCounter.ixx
+      src/loc.Counter/FSLineCounter.ixx
+)
+target_link_libraries(loc.Counter PRIVATE loc.Filesystem)
+
 # Main executable
 add_executable(loc
   loc.cpp
   include/loc.h
-  include/ILineCounter.h
-  include/CLineCounter.h
-  CLineCounter.cpp
   include/Counter.h
   Counter.cpp
-  PyLineCounter.cpp
-  include/PyLineCounter.h
-  include/FSLineCounter.h
-  FSLineCounter.cpp
 )
 
-target_link_libraries(loc PRIVATE Filesystem CLI11::CLI11)
+target_link_libraries(loc PRIVATE loc.Filesystem loc.Counter CLI11::CLI11)
 
 # Release flags
 if (MSVC)

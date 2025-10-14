@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "include/CLineCounter.h"
+import loc.Counter;
 
 TEST_CASE("Count Lines in a C++ file")
 {
