@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <filesystem>
 
-import Filesystem;
+import loc.Filesystem;
 
 TEST_CASE("Test DirectoryScanner")
 {

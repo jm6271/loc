@@ -7,9 +7,8 @@
 #include <queue>
 #include "include/PyLineCounter.h"
 #include "include/FSLineCounter.h"
-#include "include/ExpandGlob.h"
 
-import Filesystem;
+import loc.Filesystem;
 
 /**
  * Constructor for the Counter class.

@@ -17,8 +17,9 @@ add_library(Filesystem STATIC)
 target_sources(Filesystem
   PUBLIC
     FILE_SET CXX_MODULES FILES
-      src/Filesystem/Filesystem.ixx
-      src/Filesystem/Filesystem_DirectoryScanner.ixx
+      src/loc.Filesystem/loc.Filesystem.ixx
+      src/loc.Filesystem/DirectoryScanner.ixx
+      src/loc.Filesystem/ExpandGlob.ixx
 )
 
 # Main executable
@@ -36,8 +37,6 @@ add_executable(loc
   include/PyLineCounter.h
   include/FSLineCounter.h
   FSLineCounter.cpp
-  include/ExpandGlob.h
-  ExpandGlob.cpp
 )
 
 target_link_libraries(loc PRIVATE Filesystem CLI11::CLI11)

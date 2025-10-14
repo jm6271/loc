@@ -6,7 +6,7 @@ module;
 #include <iostream>
 #include <algorithm>
 
-export module Filesystem:DirectoryScanner;
+export module loc.Filesystem:DirectoryScanner;
 
 
 // Class for scanning files in a directory
