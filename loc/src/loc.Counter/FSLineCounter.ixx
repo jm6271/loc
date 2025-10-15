@@ -1,6 +1,8 @@
 module;
 
 #include <filesystem>
+#include <vector>
+#include <string>
 
 export module loc.Counter:FSLineCounter;
 
