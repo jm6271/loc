@@ -3,6 +3,8 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+import loc.Counter;
+
 int main(int argc, char** argv)
 {
 	// Start time of program

@@ -32,6 +32,7 @@ target_sources(loc.Counter
       src/loc.Counter/CLineCounter.ixx
       src/loc.Counter/PyLineCounter.ixx
       src/loc.Counter/FSLineCounter.ixx
+      src/loc.Counter/Counter.ixx
 )
 target_link_libraries(loc.Counter PRIVATE loc.Filesystem)
 
@@ -39,8 +40,6 @@ target_link_libraries(loc.Counter PRIVATE loc.Filesystem)
 add_executable(loc
   loc.cpp
   include/loc.h
-  include/Counter.h
-  Counter.cpp
 )
 
 target_link_libraries(loc PRIVATE loc.Filesystem loc.Counter CLI11::CLI11)

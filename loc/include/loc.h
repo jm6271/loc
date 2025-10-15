@@ -13,8 +13,6 @@
 
 #include <CLI/CLI.hpp>
 
-#include "Counter.h"
-
 
 // struct for printing out large numbers with commas
 struct comma_numpunct : std::numpunct<char> 
@@ -25,7 +23,7 @@ protected:
 
 // Extensions for the different programming languages
 const std::vector<std::string> C_EXTENSIONS = { ".c", ".h" };
-const std::vector<std::string> CPP_EXTENSIONS = { ".cpp", ".h", ".hpp", ".cxx", ".hxx", ".c++", ".cc" };
+const std::vector<std::string> CPP_EXTENSIONS = { ".cpp", ".h", ".hpp", ".cxx", ".hxx", ".c++", ".cc", ".ixx", ".cppm"};
 const std::vector<std::string> PY_EXTENSIONS = { ".py", ".pyw" };
 const std::vector<std::string> FS_EXTENSIONS = { ".fs", ".fsx" };
 const std::vector<std::string> CS_EXTENSIONS = { ".cs" };
