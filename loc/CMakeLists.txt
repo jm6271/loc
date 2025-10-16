@@ -38,8 +38,7 @@ target_link_libraries(loc.Counter PRIVATE loc.Filesystem)
 
 # Main executable
 add_executable(loc
-  loc.cpp
-  include/loc.h
+  "main.cpp"
 )
 
 target_link_libraries(loc PRIVATE loc.Filesystem loc.Counter CLI11::CLI11)
