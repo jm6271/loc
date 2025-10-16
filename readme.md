@@ -43,9 +43,11 @@ $env:VCPKG_ROOT = (Get-Location).Path + "\vcpkg"
 $env:PATH = $env:VCPKG_ROOT + ";" + $env:PATH
 
 # build loc
-mkdir build
-cd build
-cmake --preset=x64-release build .. # replace preset with x86-release for 32-bit
+cmake --preset=x64-release # replace preset with x86-release for 32-bit
+cd out/build/x64-release # or x86-release
+ninja
+
+# release binary is located at out/build/x64-release/loc/loc.exe
 ```
 
 ### Linux:
@@ -131,7 +133,7 @@ To count the lines of code in the ```loc``` codebase from
 the toplevel directory running on 10 threads, use this command:
 
 ```
-loc -j 10 files ./loc/*.cpp ./loc/include/*.h ./loc.tests/*.cpp
+loc -j 10 files ./loc/*.cpp ./loc/**/*.ixx ./loc.tests/*.cpp
 ```
 
 Or use the directory command:
