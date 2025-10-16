@@ -1,6 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
-#include "include/ExpandGlob.h"
 #include <filesystem>
+
+import loc.Filesystem;
 
 TEST_CASE("Glob expands correctly")
 {
