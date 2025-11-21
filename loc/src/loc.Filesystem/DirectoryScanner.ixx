@@ -5,17 +5,18 @@ module;
 #include <filesystem>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
 
 export module loc.Filesystem:DirectoryScanner;
 
-
-// Class for scanning files in a directory
 export class DirectoryScanner
 {
 public:
     DirectoryScanner() = default;
 
-    std::vector<std::filesystem::path> Scan(const std::filesystem::path& directory, const std::vector<std::string>& extensions,
+    std::vector<std::filesystem::path> Scan(
+        const std::filesystem::path& directory,
+        const std::vector<std::string>& extensions,
         const std::vector<std::filesystem::path>& ignoreDirs) const
     {
         std::vector<std::filesystem::path> result;
@@ -23,95 +24,114 @@ public:
             return result;
         }
 
-        // Normalize ignore directories into absolute canonical paths
+        // Pre-compute canonical ignore paths once
         std::vector<std::filesystem::path> ignorePaths;
-        if (!ignoreDirs.empty())
-        {
-            for (const auto& dir : ignoreDirs) {
-                if (dir.is_absolute()) {
-                    ignorePaths.push_back(std::filesystem::weakly_canonical(dir));
-                }
-                else {
-                    ignorePaths.push_back(std::filesystem::weakly_canonical(directory / dir));
-                }
+        ignorePaths.reserve(ignoreDirs.size());
+        for (const auto& dir : ignoreDirs) {
+            try {
+                auto canonical = dir.is_absolute()
+                    ? std::filesystem::weakly_canonical(dir)
+                    : std::filesystem::weakly_canonical(directory / dir);
+                ignorePaths.push_back(std::move(canonical));
+            }
+            catch (...) {
+                // Skip paths that can't be canonicalized
             }
         }
 
-        std::filesystem::recursive_directory_iterator it(directory);
+        // Use unordered_set for O(1) extension lookups
+        std::unordered_set<std::string> extSet(extensions.begin(), extensions.end());
+
+        // Use error code version to avoid exceptions
+        std::error_code ec;
+        std::filesystem::recursive_directory_iterator it(directory, ec);
         std::filesystem::recursive_directory_iterator end;
 
         while (it != end) {
-            const std::filesystem::directory_entry& entry = *it;
+            const auto& entry = *it;
 
-            if (entry.is_directory() && !ignorePaths.empty()) {
-                std::filesystem::path current = std::filesystem::weakly_canonical(entry.path());
-                // Skip if inside any ignored directory
-                bool skip = std::any_of(ignorePaths.begin(), ignorePaths.end(),
-                    [&](const std::filesystem::path& ignore) {
-                        return isSubPath(ignore, current);
-                    });
-                if (skip) {
-                    it.disable_recursion_pending();
-                }
-            }
-            else if (entry.is_regular_file()) {
-                std::string ext = entry.path().extension().string();
-                if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
-                    result.push_back(entry.path());
-                }
-            }
-            ++it;
-        }
-        return result;
-    }
-
-    std::vector<std::filesystem::path> FindIgnoredDirectories(const std::filesystem::path& directory, const std::vector<std::string>& ignorePatterns) const
-    {
-        std::vector<std::filesystem::path> ignoredDirectories;
-
-        if (std::filesystem::exists(directory) && std::filesystem::is_directory(directory))
-        {
-            for (const auto& entry : std::filesystem::recursive_directory_iterator(directory))
-            {
-                if (std::filesystem::is_directory(entry.status()))
-                {
-                    // Check if the directory name matches any of the ignore patterns
-                    for (const auto& pattern : ignorePatterns)
-                    {
-                        if (entry.path().filename() == pattern)
-                        {
-                            ignoredDirectories.push_back(entry.path());
-                            break; // No need to check other patterns for this directory
-                        }
+            if (entry.is_directory(ec)) {
+                // Only canonicalize if we have ignore paths
+                if (!ignorePaths.empty()) {
+                    auto current = std::filesystem::weakly_canonical(entry.path(), ec);
+                    if (!ec && shouldIgnore(current, ignorePaths)) {
+                        it.disable_recursion_pending();
                     }
                 }
             }
+            else if (entry.is_regular_file(ec)) {
+                // Avoid string allocation - compare string_view if possible
+                const auto& ext = entry.path().extension();
+                if (!ext.empty() && extSet.count(ext.string()) > 0) {
+                    result.push_back(entry.path());
+                }
+            }
+
+            it.increment(ec);
+            if (ec) {
+                // Log error if needed, then continue
+                ec.clear();
+            }
         }
-        else
+
+        return result;
+    }
+
+    std::vector<std::filesystem::path> FindIgnoredDirectories(
+        const std::filesystem::path& directory,
+        const std::vector<std::string>& ignorePatterns) const
+    {
+        std::vector<std::filesystem::path> ignoredDirectories;
+
+        if (!std::filesystem::exists(directory) || !std::filesystem::is_directory(directory)) {
+            std::cerr << "Directory does not exist or is not a directory '"
+                << directory << '\'' << std::endl;
+            return ignoredDirectories;
+        }
+
+        // Use unordered_set for faster pattern matching
+        std::unordered_set<std::string> patternSet(ignorePatterns.begin(), ignorePatterns.end());
+
+        std::error_code ec;
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(directory, ec))
         {
-            std::cerr << "Directory does not exist or is not a directory '" << directory << '\'' << std::endl;
+            if (entry.is_directory(ec))
+            {
+                auto filename = entry.path().filename().string();
+                if (patternSet.count(filename) > 0)
+                {
+                    ignoredDirectories.push_back(entry.path());
+                }
+            }
         }
 
         return ignoredDirectories;
     }
 
 private:
+    bool shouldIgnore(const std::filesystem::path& current,
+        const std::vector<std::filesystem::path>& ignorePaths) const
+    {
+        return std::any_of(ignorePaths.begin(), ignorePaths.end(),
+            [&](const std::filesystem::path& ignore) {
+                return isSubPath(ignore, current);
+            });
+    }
 
     bool isSubPath(const std::filesystem::path& base, const std::filesystem::path& path) const
     {
-        auto baseAbs = std::filesystem::weakly_canonical(base);
-        auto pathAbs = std::filesystem::weakly_canonical(path);
+        // Paths are already canonical, no need to canonicalize again
+        auto baseIt = base.begin();
+        auto pathIt = path.begin();
 
-        auto baseIt = baseAbs.begin();
-        auto pathIt = pathAbs.begin();
-
-        for (; baseIt != baseAbs.end() && pathIt != pathAbs.end(); ++baseIt, ++pathIt) {
+        while (baseIt != base.end() && pathIt != path.end()) {
             if (*baseIt != *pathIt) {
                 return false;
             }
+            ++baseIt;
+            ++pathIt;
         }
 
-        // True if base was fully consumed (base == path, or base is a prefix of path)
-        return baseIt == baseAbs.end();
+        return baseIt == base.end();
     }
 };
