@@ -1,117 +1,126 @@
 module;
 
+#include <filesystem>
 #include <string>
 #include <vector>
-#include <filesystem>
-#include <iostream>
+#include <unordered_set>
 #include <algorithm>
+#include <cctype>
+#include <system_error>
 
 export module loc.Filesystem:DirectoryScanner;
 
-
-// Class for scanning files in a directory
 export class DirectoryScanner
 {
 public:
     DirectoryScanner() = default;
 
-    std::vector<std::filesystem::path> Scan(const std::filesystem::path& directory, const std::vector<std::string>& extensions,
-        const std::vector<std::filesystem::path>& ignoreDirs) const
+    std::vector<std::filesystem::path> Scan(
+        const std::filesystem::path& root,
+        const std::vector<std::string>& extensions,
+        const std::vector<std::filesystem::path>& ignore_dir_names = {},
+        bool case_insensitive = true,
+        bool follow_directory_symlinks = false,
+        size_t reserve_result = 0)
     {
         std::vector<std::filesystem::path> result;
-        if (!std::filesystem::exists(directory) || !std::filesystem::is_directory(directory)) {
+        if (reserve_result) result.reserve(reserve_result);
+
+        // Build normalized extension set
+        std::unordered_set<std::string> ext_set;
+        ext_set.reserve(extensions.size() * 2 + 4);
+        for (const auto& e : extensions) {
+            auto ne = normalize_ext(e, case_insensitive);
+            if (!ne.empty()) ext_set.insert(std::move(ne));
+        }
+        if (ext_set.empty()) return result; // nothing to match
+
+        // Build ignore dir set (normalized per case setting)
+        std::unordered_set<std::string> ignore_set;
+        ignore_set.reserve(ignore_dir_names.size() * 2 + 4);
+        for (const auto& d : ignore_dir_names) {
+            if (d.empty()) continue;
+            if (case_insensitive) ignore_set.insert(to_lower_ascii(d.string()));
+            else ignore_set.insert(d.string());
+        }
+
+        std::error_code ec; // avoid exceptions from filesystem
+        std::filesystem::directory_options opts = std::filesystem::directory_options::skip_permission_denied;
+
+        if (follow_directory_symlinks) {
+            opts |= std::filesystem::directory_options::follow_directory_symlink;
+        }
+
+        std::filesystem::recursive_directory_iterator it(root, opts, ec);
+        if (ec) {
+            // couldn't start iteration (permission / not found). return empty result.
             return result;
         }
+        const std::filesystem::recursive_directory_iterator end_it;
 
-        // Normalize ignore directories into absolute canonical paths
-        std::vector<std::filesystem::path> ignorePaths;
-        if (!ignoreDirs.empty())
-        {
-            for (const auto& dir : ignoreDirs) {
-                if (dir.is_absolute()) {
-                    ignorePaths.push_back(std::filesystem::weakly_canonical(dir));
+        for (; it != end_it; ++it) {
+            // Protect against filesystem errors per-entry
+            std::error_code entry_ec;
+
+            const std::filesystem::directory_entry& de = *it;
+
+            // If it's a directory and matches ignore list, skip recursion into it.
+            if (de.is_directory(entry_ec)) {
+                if (entry_ec) { /* skip problematic entry */ continue; }
+
+                if (!ignore_set.empty()) {
+                    // get filename (last component) as string
+                    auto filename = de.path().filename().string();
+                    if (case_insensitive) filename = to_lower_ascii(filename);
+                    if (ignore_set.find(filename) != ignore_set.end()) {
+                        it.disable_recursion_pending(); // do not descend into this dir
+                        continue;
+                    }
                 }
-                else {
-                    ignorePaths.push_back(std::filesystem::weakly_canonical(directory / dir));
-                }
+                // not a file -> continue
+                continue;
+            }
+
+            // We're interested only in regular files (skip sockets, device files, etc.)
+            if (!de.is_regular_file(entry_ec)) {
+                continue;
+            }
+
+            // get extension and test
+            std::string ext = de.path().extension().string();
+            if (case_insensitive) ext = to_lower_ascii(ext);
+            if (ext_set.find(ext) != ext_set.end()) {
+                // matched; append path (store as std::filesystem::path to avoid forcing string encoding prematurely)
+                result.emplace_back(de.path());
             }
         }
 
-        std::filesystem::recursive_directory_iterator it(directory);
-        std::filesystem::recursive_directory_iterator end;
-
-        while (it != end) {
-            const std::filesystem::directory_entry& entry = *it;
-
-            if (entry.is_directory() && !ignorePaths.empty()) {
-                std::filesystem::path current = std::filesystem::weakly_canonical(entry.path());
-                // Skip if inside any ignored directory
-                bool skip = std::any_of(ignorePaths.begin(), ignorePaths.end(),
-                    [&](const std::filesystem::path& ignore) {
-                        return isSubPath(ignore, current);
-                    });
-                if (skip) {
-                    it.disable_recursion_pending();
-                }
-            }
-            else if (entry.is_regular_file()) {
-                std::string ext = entry.path().extension().string();
-                if (std::find(extensions.begin(), extensions.end(), ext) != extensions.end()) {
-                    result.push_back(entry.path());
-                }
-            }
-            ++it;
-        }
         return result;
     }
 
-    std::vector<std::filesystem::path> FindIgnoredDirectories(const std::filesystem::path& directory, const std::vector<std::string>& ignorePatterns) const
-    {
-        std::vector<std::filesystem::path> ignoredDirectories;
-
-        if (std::filesystem::exists(directory) && std::filesystem::is_directory(directory))
-        {
-            for (const auto& entry : std::filesystem::recursive_directory_iterator(directory))
-            {
-                if (std::filesystem::is_directory(entry.status()))
-                {
-                    // Check if the directory name matches any of the ignore patterns
-                    for (const auto& pattern : ignorePatterns)
-                    {
-                        if (entry.path().filename() == pattern)
-                        {
-                            ignoredDirectories.push_back(entry.path());
-                            break; // No need to check other patterns for this directory
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            std::cerr << "Directory does not exist or is not a directory '" << directory << '\'' << std::endl;
-        }
-
-        return ignoredDirectories;
+private:
+    // Lowercase ASCII helper (fast; avoids locale overhead)
+    inline std::string to_lower_ascii(std::string_view s) {
+        std::string out;
+        out.reserve(s.size());
+        for (unsigned char c : s) out.push_back(static_cast<char>(std::tolower(c)));
+        return out;
     }
 
-private:
-
-    bool isSubPath(const std::filesystem::path& base, const std::filesystem::path& path) const
-    {
-        auto baseAbs = std::filesystem::weakly_canonical(base);
-        auto pathAbs = std::filesystem::weakly_canonical(path);
-
-        auto baseIt = baseAbs.begin();
-        auto pathIt = pathAbs.begin();
-
-        for (; baseIt != baseAbs.end() && pathIt != pathAbs.end(); ++baseIt, ++pathIt) {
-            if (*baseIt != *pathIt) {
-                return false;
-            }
+    // Normalize an extension: ensure it starts with '.' and (optionally) lowercase it.
+    inline std::string normalize_ext(std::string_view ext, bool case_insensitive) {
+        if (ext.empty()) return std::string{};
+        size_t pos = 0;
+        // if user passed "txt" convert to ".txt"
+        if (ext.front() != '.') {
+            std::string tmp;
+            tmp.reserve(ext.size() + 1);
+            tmp.push_back('.');
+            tmp.append(ext);
+            if (case_insensitive) return to_lower_ascii(tmp);
+            return tmp;
         }
-
-        // True if base was fully consumed (base == path, or base is a prefix of path)
-        return baseIt == baseAbs.end();
+        if (case_insensitive) return to_lower_ascii(ext);
+        return std::string(ext);
     }
 };

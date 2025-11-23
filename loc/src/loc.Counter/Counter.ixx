@@ -65,7 +65,7 @@ public:
 		std::vector<std::filesystem::path> ignore = ignoreDirs;
 		if (!includeGenerated)
 		{
-			auto generatedDirs = directorScanner.FindIgnoredDirectories(directoryPath, { "obj", "out", ".git", "bin" });
+			std::vector<std::filesystem::path> generatedDirs{ "obj", "out", ".git", "bin" };
 			ignore.insert(ignore.end(), generatedDirs.begin(), generatedDirs.end());
 		}
 
