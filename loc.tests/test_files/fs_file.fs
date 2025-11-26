@@ -8,4 +8,4 @@ Use the printfn function to display a message.
 This function outputs the message, followed by a new line.
 *)
     printfn("Hello World!")
-    0
+    (* Return 0 *) 0
