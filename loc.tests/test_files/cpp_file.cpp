@@ -10,6 +10,7 @@ int main()
     // Print a message to the console
     std::cout << "Hello, world!\n";
 
+    /* Return 0 */
     return 0;
 }
 
