@@ -8,9 +8,9 @@
 class SomeRandomeTestClass
 {
 public:
-    SomeRandomeTestClass()
+    SomeRandomeTestClass() /* Test inline multiline style comments */
     {
-        std::cout << "Hello, world!\n";
+        /* Print Hello World to stdout */ std::cout << "Hello, world!\n";
     }
 
     ~SomeRandomeTestClass()

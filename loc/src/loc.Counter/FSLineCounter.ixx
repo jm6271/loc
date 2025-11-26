@@ -33,19 +33,30 @@ public:
 				continue;
 
 			// check for multiline comments
-			if (line.starts_with("(*"))
+			if (StrContains(line, "(*"))
 			{
-				if (line.ends_with("*)"))
+				if (StrContains(line, "*)"))
+				{
+					InMultiLineComment = false;
+					if (!line.starts_with("(*") || !line.ends_with("*)"))
+					{
+						totalLines++;
+					}
 					continue;
+				}
 
 				InMultiLineComment = true;
 				continue;
 			}
 
+			if (StrContains(line, "*)"))
+			{
+				InMultiLineComment = false;
+				continue;
+			}
+
 			if (InMultiLineComment)
 			{
-				if (line.ends_with("*)"))
-					InMultiLineComment = false;
 				continue;
 			}
 
@@ -54,5 +65,12 @@ public:
 		}
 
 		return totalLines;
+	}
+
+private:
+
+	bool StrContains(const std::string& str, const std::string& substr)
+	{
+		return str.find(substr) != std::string::npos;
 	}
 };
