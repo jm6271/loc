@@ -39,6 +39,10 @@ public:
         if (recursive) {
             for (auto& entry : fs::recursive_directory_iterator(base_dir)) {
                 if (!entry.is_regular_file()) continue;
+                
+                // Skip files in hidden directories (directories starting with '.')
+                if (is_in_hidden_directory(entry.path())) continue;
+                
                 if (std::regex_match(entry.path().filename().string(), rex))
                     out.emplace_back(entry.path());
             }
@@ -75,4 +79,16 @@ private:
         }
         return std::regex{ "^" + re + "$", std::regex::ECMAScript | std::regex::icase };
 	}
+
+    bool is_in_hidden_directory(const std::filesystem::path& path) const
+    {
+        // Check all parent directories to see if any starts with '.'
+        for (auto it = path.parent_path(); !it.empty(); it = it.parent_path()) {
+            auto dirname = it.filename().string();
+            if (!dirname.empty() && dirname[0] == '.') {
+                return true;
+            }
+        }
+        return false;
+    }
 };
