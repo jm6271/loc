@@ -77,6 +77,14 @@ public:
                         continue;
                     }
                 }
+                
+                // Skip directories starting with '.' (hidden directories)
+                auto dirname = de.path().filename().string();
+                if (!dirname.empty() && dirname[0] == '.') {
+                    it.disable_recursion_pending();
+                    continue;
+                }
+                
                 // not a file -> continue
                 continue;
             }
