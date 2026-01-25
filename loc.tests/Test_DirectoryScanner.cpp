@@ -18,10 +18,11 @@ TEST_CASE("Test DirectoryScanner")
     expected.push_back(test_dir + "/cpp_file.cpp");
     expected.push_back(test_dir + "/cpp_file2.cpp");
     expected.push_back(test_dir + "/header.h");
+    expected.push_back(test_dir + "/fs_file.fs");
 
     // Actual data
     std::vector<std::filesystem::path> actual{};
-    actual = scanner.Scan(test_dir, {".cpp", ".py", ".h"}, {});
+    actual = scanner.Scan(test_dir, {});
 
     // Check if the actual data matches the expected data
     // Sort the vectors first to make sure items are in the same order

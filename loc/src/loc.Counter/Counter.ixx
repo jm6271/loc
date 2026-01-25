@@ -10,6 +10,8 @@ module;
 #include <future>
 #include <iostream>
 #include <queue>
+#include <map>
+#include <iomanip>
 
 export module loc.Counter:Counter;
 
@@ -54,7 +56,7 @@ public:
 	* to be counted according to the provided filters. It does not start the counting
 	* threads; call `Count()` to begin processing.
 	*/
-	Counter(unsigned int jobs, const std::filesystem::path& directoryPath, const std::vector<std::string>& extensions,
+	Counter(unsigned int jobs, const std::filesystem::path& directoryPath,
 		bool includeGenerated, const std::vector<std::filesystem::path>& ignoreDirs)
 	{
 		this->jobs = jobs;
@@ -70,7 +72,7 @@ public:
 		}
 
 		// Get the paths to all the files that match the specified pattern, excluding files in ignored directories
-		paths = directorScanner.Scan(directoryPath, extensions, ignore);
+		paths = directorScanner.Scan(directoryPath, ignore);
 	}
 
 	/**
@@ -115,18 +117,103 @@ public:
 		return total_lines;
 	}
 
+	void PrintLanguageBreakdown() const
+	{
+		if (language_line_counts.size() == 0) return;
+
+		// set up cout to print commas in large numbers
+		std::cout.imbue(std::locale(std::cout.getloc(), new comma_numpunct()));
+		
+		std::cout << "+-----------------+----------------------+----------------------+\n";
+		std::cout
+			<< "| "
+			<< std::left
+			<< std::setw(15) << "Language" << " | "
+			<< std::right << std::setw(20) << "LoC" << " | "
+			<< std::right << std::setw(20) << "Files" << " |\n";
+		std::cout << "+-----------------+----------------------+----------------------+\n";
+
+		for (const auto& [language, count] : language_line_counts)
+		{
+			std::string language_name;
+			switch (language)
+			{
+			case FILE_LANGUAGE::C:
+				language_name = "C";
+				break;
+			case FILE_LANGUAGE::CHeader:
+				language_name = "C Header";
+				break;
+			case FILE_LANGUAGE::Cpp:
+				language_name = "C++";
+				break;
+			case FILE_LANGUAGE::CS:
+				language_name = "C#";
+				break;
+			case FILE_LANGUAGE::Rust:
+				language_name = "Rust";
+				break;
+			case FILE_LANGUAGE::Python:
+				language_name = "Python";
+				break;
+			case FILE_LANGUAGE::FSharp:
+				language_name = "F#";
+				break;
+			default:
+				language_name = "Other";
+				break;
+			}
+
+			std::ostringstream oss;
+			oss.imbue(std::cout.getloc());
+			oss << count.first;
+			std::string line_col = oss.str() + " lines";
+
+			oss.str("");
+			oss.clear();
+			oss << count.second;
+			std::string file_col = oss.str() + " files";
+
+			std::cout
+				<< "| "
+				<< std::left
+				<< std::setw(15) << language_name << " | "
+				<< std::right << std::setw(20) << line_col << " | "
+				<< std::right << std::setw(20) << file_col << " |\n";
+		}
+
+		std::cout << "+-----------------+----------------------+----------------------+\n";
+	}
+
 
 private:
+
+	enum class FILE_LANGUAGE
+	{
+		C,
+		CHeader,
+		Cpp,
+		CS,
+		Rust,
+		Python,
+		FSharp,
+		Other
+	};
+
 	unsigned int jobs{};
 	std::vector<std::filesystem::path> paths{};
 	std::atomic<unsigned long> total_lines{};
 	std::atomic<size_t> next_index = 0;
 
-	enum class FILE_LANGUAGE
+	std::mutex language_line_counts_mutex{};
+	std::map<FILE_LANGUAGE, std::pair<unsigned int, unsigned int>> language_line_counts{};
+
+	// struct for printing out large numbers with commas
+	struct comma_numpunct : std::numpunct<char>
 	{
-		C,
-		Python,
-		FSharp
+	protected:
+		std::string do_grouping() const override { return "\3"; }
+		char do_thousands_sep() const override { return ','; }
 	};
 
 	/**
@@ -150,31 +237,34 @@ private:
 	* @return The number of lines in the file. Returns 0 if the file type is unsupported
 	*         or if the language-specific counter fails to read the file.
 	*/
-	unsigned long CountFile(const std::filesystem::path& path) const
+	unsigned long CountFile(const std::filesystem::path& path)
 	{
 		// Get the file language
 		FILE_LANGUAGE language = GetFileLanguage(path);
+		unsigned long lines = 0;
 
 		// use the correct line counting class to count the lines of code in the file
-		if (language == FILE_LANGUAGE::C)
-		{
-			CLineCounter counter;
-			return counter.CountLines(path);
-		}
-		else if (language == FILE_LANGUAGE::Python)
+		if (language == FILE_LANGUAGE::Python)
 		{
 			PyLineCounter counter;
-			return counter.CountLines(path);
+			lines = counter.CountLines(path);
 		}
 		else if (language == FILE_LANGUAGE::FSharp)
 		{
 			FSLineCounter counter;
-			return counter.CountLines(path);
+			lines = counter.CountLines(path);
 		}
 		else
 		{
-			return 0;
+			CLineCounter counter;
+			lines = counter.CountLines(path);
 		}
+
+		std::scoped_lock lock(language_line_counts_mutex);
+		language_line_counts[language].first += lines;
+		language_line_counts[language].second++; // File count
+
+		return lines;
 	}
 
 	/**
@@ -186,10 +276,6 @@ private:
 	*/
 	FILE_LANGUAGE GetFileLanguage(const std::filesystem::path& path) const
 	{
-		// if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then return C
-		// if the path ends with .py or .pyw then return Python
-		// if the path ends with .fs or .fsx then return FSharp
-
 		std::string extension = path.extension().string();
 
 		if (extension == ".py" || extension == ".pyw")
@@ -200,9 +286,31 @@ private:
 		{
 			return FILE_LANGUAGE::FSharp;
 		}
-		else // everything else is C
+		else if (extension == ".c")
 		{
 			return FILE_LANGUAGE::C;
+
+		}
+		else if (extension == ".h")
+		{
+			return FILE_LANGUAGE::CHeader;
+		}
+		else if (extension == ".cpp" || extension == ".hpp" || extension == ".cxx" ||
+			extension == ".hxx" || extension == ".c++" || extension == ".cc" || extension == ".ixx" || extension == ".cppm")
+		{
+			return FILE_LANGUAGE::Cpp;
+		}
+		else if (extension == ".cs")
+		{
+			return FILE_LANGUAGE::CS;
+		}
+		else if (extension == ".rs")
+		{
+			return FILE_LANGUAGE::Rust;
+		}
+		else
+		{
+			return FILE_LANGUAGE::Other;
 		}
 	}
 

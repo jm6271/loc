@@ -17,7 +17,6 @@ public:
 
     std::vector<std::filesystem::path> Scan(
         const std::filesystem::path& root,
-        const std::vector<std::string>& extensions,
         const std::vector<std::filesystem::path>& ignore_dir_names = {},
         bool case_insensitive = true,
         bool follow_directory_symlinks = false,
@@ -28,8 +27,8 @@ public:
 
         // Build normalized extension set
         std::unordered_set<std::string> ext_set;
-        ext_set.reserve(extensions.size() * 2 + 4);
-        for (const auto& e : extensions) {
+        ext_set.reserve(24);
+        for (const auto& e : supported_extensions) {
             auto ne = normalize_ext(e, case_insensitive);
             if (!ne.empty()) ext_set.insert(std::move(ne));
         }
@@ -131,4 +130,14 @@ private:
         if (case_insensitive) return to_lower_ascii(ext);
         return std::string(ext);
     }
+
+    static constexpr const char* supported_extensions[] = {
+        ".c", ".h",
+        ".py", ".pyw",
+        ".fs", ".fsx",
+        ".cpp", ".hpp", ".cxx",
+        ".hxx", ".c++", ".cc", ".ixx", ".cppm",
+        ".cs",
+        ".rs",
+    };
 };
