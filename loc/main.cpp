@@ -106,7 +106,9 @@ int main(int argc, char** argv)
 		auto lines = counter.Count();
 
 		// Print the lines of code
-		cout << "Counted " << lines << " lines of code";
+		cout << std::endl;
+		counter.PrintLanguageBreakdown();
+		cout << "\nCounted " << lines << " lines of code";
 	}
 	else if (*directory_command)
 	{
@@ -130,7 +132,9 @@ int main(int argc, char** argv)
 		Counter counter(jobs, directory_path, extensions, include_generated, ignore_dirs);
 		auto lines = counter.Count();
 		
-		cout << "Counted " << lines << " lines of code";
+		cout << std::endl;
+		counter.PrintLanguageBreakdown();
+		cout << "\nCounted " << lines << " lines of code";
 	}
 	else if (version)
 	{

@@ -10,6 +10,7 @@ module;
 #include <future>
 #include <iostream>
 #include <queue>
+#include <map>
 
 export module loc.Counter:Counter;
 
@@ -115,19 +116,64 @@ public:
 		return total_lines;
 	}
 
+	void PrintLanguageBreakdown() const
+	{
+		for (const auto& [language, count] : language_line_counts)
+		{
+			std::string language_name;
+			switch (language)
+			{
+			case FILE_LANGUAGE::C:
+				language_name = "C\t\t\t";
+				break;
+			case FILE_LANGUAGE::CHeader:
+				language_name = "C Header\t\t";
+				break;
+			case FILE_LANGUAGE::Cpp:
+				language_name = "C++\t\t\t";
+				break;
+			case FILE_LANGUAGE::CS:
+				language_name = "C#\t\t\t";
+				break;
+			case FILE_LANGUAGE::Rust:
+				language_name = "Rust\t\t\t";
+				break;
+			case FILE_LANGUAGE::Python:
+				language_name = "Python\t\t\t";
+				break;
+			case FILE_LANGUAGE::FSharp:
+				language_name = "F#\t\t\t";
+				break;
+			default:
+				language_name = "Other\t\t\t";
+				break;
+			}
+			std::cout << language_name << count << " lines\n";
+		}
+	}
+
 
 private:
+
+	enum class FILE_LANGUAGE
+	{
+		C,
+		CHeader,
+		Cpp,
+		CS,
+		Rust,
+		Python,
+		FSharp,
+		Other
+	};
+
 	unsigned int jobs{};
 	std::vector<std::filesystem::path> paths{};
 	std::atomic<unsigned long> total_lines{};
 	std::atomic<size_t> next_index = 0;
 
-	enum class FILE_LANGUAGE
-	{
-		C,
-		Python,
-		FSharp
-	};
+	std::mutex language_line_counts_mutex{};
+	std::map<FILE_LANGUAGE, unsigned long> language_line_counts{};
 
 	/**
 	* Check if a path refers to an existing directory on the filesystem.
@@ -150,31 +196,33 @@ private:
 	* @return The number of lines in the file. Returns 0 if the file type is unsupported
 	*         or if the language-specific counter fails to read the file.
 	*/
-	unsigned long CountFile(const std::filesystem::path& path) const
+	unsigned long CountFile(const std::filesystem::path& path)
 	{
 		// Get the file language
 		FILE_LANGUAGE language = GetFileLanguage(path);
+		unsigned long lines = 0;
 
 		// use the correct line counting class to count the lines of code in the file
-		if (language == FILE_LANGUAGE::C)
-		{
-			CLineCounter counter;
-			return counter.CountLines(path);
-		}
-		else if (language == FILE_LANGUAGE::Python)
+		if (language == FILE_LANGUAGE::Python)
 		{
 			PyLineCounter counter;
-			return counter.CountLines(path);
+			lines = counter.CountLines(path);
 		}
 		else if (language == FILE_LANGUAGE::FSharp)
 		{
 			FSLineCounter counter;
-			return counter.CountLines(path);
+			lines = counter.CountLines(path);
 		}
 		else
 		{
-			return 0;
+			CLineCounter counter;
+			lines = counter.CountLines(path);
 		}
+
+		std::scoped_lock lock(language_line_counts_mutex);
+		language_line_counts[language] += lines;
+
+		return lines;
 	}
 
 	/**
@@ -186,10 +234,6 @@ private:
 	*/
 	FILE_LANGUAGE GetFileLanguage(const std::filesystem::path& path) const
 	{
-		// if the path ends with .c, .h, .hpp, .cpp, .cxx, .c++, or .cs then return C
-		// if the path ends with .py or .pyw then return Python
-		// if the path ends with .fs or .fsx then return FSharp
-
 		std::string extension = path.extension().string();
 
 		if (extension == ".py" || extension == ".pyw")
@@ -200,9 +244,31 @@ private:
 		{
 			return FILE_LANGUAGE::FSharp;
 		}
-		else // everything else is C
+		else if (extension == ".c")
 		{
 			return FILE_LANGUAGE::C;
+
+		}
+		else if (extension == ".h")
+		{
+			return FILE_LANGUAGE::CHeader;
+		}
+		else if (extension == ".cpp" || extension == ".hpp" || extension == ".cxx" ||
+			extension == ".hxx" || extension == ".c++" || extension == ".cc" || extension == ".ixx" || extension == ".cppm")
+		{
+			return FILE_LANGUAGE::Cpp;
+		}
+		else if (extension == ".cs")
+		{
+			return FILE_LANGUAGE::CS;
+		}
+		else if (extension == ".rs")
+		{
+			return FILE_LANGUAGE::Rust;
+		}
+		else
+		{
+			return FILE_LANGUAGE::Other;
 		}
 	}
 
