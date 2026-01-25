@@ -62,33 +62,10 @@ int main(int argc, char** argv)
 	// directory command
 	auto directory_command = app.add_subcommand("dir", "Count lines of code in files with provided extensions in a directory");
 	fs::path directory_path{};
-	vector<string> extensions{};
-	bool cpp_extensions = false;
-	bool cs_extensions = false;
-	bool py_extensions = false;
-	bool fs_extensions = false;
-	bool c_extensions = false;
 	bool include_generated = false;
 	vector<fs::path> ignore_dirs{};
 
-	directory_command->add_flag("--cpp", cpp_extensions, "Use C++ extensions (.cpp, .h, .hpp, .cxx, .hxx, .c++, .cc)")
-		->capture_default_str()
-		->default_val(false);
-	directory_command->add_flag("--cs", cs_extensions, "Use C# extensions (.cs)")
-		->capture_default_str()
-		->default_val(false);
-	directory_command->add_flag("--py", py_extensions, "Use Python extensions (.py, .pyw)")
-		->capture_default_str()
-		->default_val(false);
-	directory_command->add_flag("--fs", fs_extensions, "Use F# extensions (.fs, .fsx)")
-		->capture_default_str()
-		->default_val(false);
-	directory_command->add_flag("--c", c_extensions, "Use C extensions (.c, .h)")
-		->capture_default_str()
-		->default_val(false);
-
-	directory_command->add_option("-e,--extention", extensions, "Extensions of files to count");
-	directory_command->add_flag("--include-generated", include_generated, "Include generated files in directories like obj/, out/, .git/, and bin/")
+	directory_command->add_flag("--include-hidden", include_generated, "Include generated files in hidden directories like obj/, out/, .git/, and bin/")
 		->capture_default_str()
 		->default_val(false);
 	directory_command->add_option("-i,--ignore", ignore_dirs, "Directories to ignore (relative to the provided directory)");
@@ -112,24 +89,7 @@ int main(int argc, char** argv)
 	}
 	else if (*directory_command)
 	{
-		if (cpp_extensions)
-			extensions.insert(extensions.end(), CPP_EXTENSIONS.begin(), CPP_EXTENSIONS.end());
-		if (cs_extensions)
-			extensions.insert(extensions.end(), CS_EXTENSIONS.begin(), CS_EXTENSIONS.end());
-		if (py_extensions)
-			extensions.insert(extensions.end(), PY_EXTENSIONS.begin(), PY_EXTENSIONS.end());
-		if (fs_extensions)
-			extensions.insert(extensions.end(), FS_EXTENSIONS.begin(), FS_EXTENSIONS.begin());
-		if (c_extensions)
-			extensions.insert(extensions.end(), C_EXTENSIONS.begin(), C_EXTENSIONS.end());
-
-		if (extensions.empty())
-		{
-			cerr << "Error: No extensions specified\n";
-			return -1;
-		}
-
-		Counter counter(jobs, directory_path, extensions, include_generated, ignore_dirs);
+		Counter counter(jobs, directory_path, include_generated, ignore_dirs);
 		auto lines = counter.Count();
 		
 		cout << std::endl;

@@ -11,6 +11,7 @@ module;
 #include <iostream>
 #include <queue>
 #include <map>
+#include <iomanip>
 
 export module loc.Counter:Counter;
 
@@ -55,7 +56,7 @@ public:
 	* to be counted according to the provided filters. It does not start the counting
 	* threads; call `Count()` to begin processing.
 	*/
-	Counter(unsigned int jobs, const std::filesystem::path& directoryPath, const std::vector<std::string>& extensions,
+	Counter(unsigned int jobs, const std::filesystem::path& directoryPath,
 		bool includeGenerated, const std::vector<std::filesystem::path>& ignoreDirs)
 	{
 		this->jobs = jobs;
@@ -71,7 +72,7 @@ public:
 		}
 
 		// Get the paths to all the files that match the specified pattern, excluding files in ignored directories
-		paths = directorScanner.Scan(directoryPath, extensions, ignore);
+		paths = directorScanner.Scan(directoryPath, ignore);
 	}
 
 	/**
@@ -118,38 +119,60 @@ public:
 
 	void PrintLanguageBreakdown() const
 	{
+		if (language_line_counts.size() == 0) return;
+		
+		std::cout << "+-----------------+----------------------+----------------------+\n";
+		std::cout
+			<< "| "
+			<< std::left
+			<< std::setw(15) << "Language" << " | "
+			<< std::right << std::setw(20) << "LoC" << " | "
+			<< std::right << std::setw(20) << "Files" << " |\n";
+		std::cout << "+-----------------+----------------------+----------------------+\n";
+
 		for (const auto& [language, count] : language_line_counts)
 		{
 			std::string language_name;
 			switch (language)
 			{
 			case FILE_LANGUAGE::C:
-				language_name = "C\t\t\t";
+				language_name = "C";
 				break;
 			case FILE_LANGUAGE::CHeader:
-				language_name = "C Header\t\t";
+				language_name = "C Header";
 				break;
 			case FILE_LANGUAGE::Cpp:
-				language_name = "C++\t\t\t";
+				language_name = "C++";
 				break;
 			case FILE_LANGUAGE::CS:
-				language_name = "C#\t\t\t";
+				language_name = "C#";
 				break;
 			case FILE_LANGUAGE::Rust:
-				language_name = "Rust\t\t\t";
+				language_name = "Rust";
 				break;
 			case FILE_LANGUAGE::Python:
-				language_name = "Python\t\t\t";
+				language_name = "Python";
 				break;
 			case FILE_LANGUAGE::FSharp:
-				language_name = "F#\t\t\t";
+				language_name = "F#";
 				break;
 			default:
-				language_name = "Other\t\t\t";
+				language_name = "Other";
 				break;
 			}
-			std::cout << language_name << count << " lines\n";
+
+			std::string line_col = std::to_string(count.first) + " lines";
+			std::string file_col = std::to_string(count.second) + " files";
+
+			std::cout
+				<< "| "
+				<< std::left
+				<< std::setw(15) << language_name << " | "
+				<< std::right << std::setw(20) << line_col << " | "
+				<< std::right << std::setw(20) << file_col << " |\n";
 		}
+
+		std::cout << "+-----------------+----------------------+----------------------+\n";
 	}
 
 
@@ -173,7 +196,7 @@ private:
 	std::atomic<size_t> next_index = 0;
 
 	std::mutex language_line_counts_mutex{};
-	std::map<FILE_LANGUAGE, unsigned long> language_line_counts{};
+	std::map<FILE_LANGUAGE, std::pair<unsigned int, unsigned int>> language_line_counts{};
 
 	/**
 	* Check if a path refers to an existing directory on the filesystem.
@@ -220,7 +243,8 @@ private:
 		}
 
 		std::scoped_lock lock(language_line_counts_mutex);
-		language_line_counts[language] += lines;
+		language_line_counts[language].first += lines;
+		language_line_counts[language].second++; // File count
 
 		return lines;
 	}
