@@ -120,6 +120,9 @@ public:
 	void PrintLanguageBreakdown() const
 	{
 		if (language_line_counts.size() == 0) return;
+
+		// set up cout to print commas in large numbers
+		std::cout.imbue(std::locale(std::cout.getloc(), new comma_numpunct()));
 		
 		std::cout << "+-----------------+----------------------+----------------------+\n";
 		std::cout
@@ -161,8 +164,15 @@ public:
 				break;
 			}
 
-			std::string line_col = std::to_string(count.first) + " lines";
-			std::string file_col = std::to_string(count.second) + " files";
+			std::ostringstream oss;
+			oss.imbue(std::cout.getloc());
+			oss << count.first;
+			std::string line_col = oss.str() + " lines";
+
+			oss.str("");
+			oss.clear();
+			oss << count.second;
+			std::string file_col = oss.str() + " files";
 
 			std::cout
 				<< "| "
@@ -197,6 +207,14 @@ private:
 
 	std::mutex language_line_counts_mutex{};
 	std::map<FILE_LANGUAGE, std::pair<unsigned int, unsigned int>> language_line_counts{};
+
+	// struct for printing out large numbers with commas
+	struct comma_numpunct : std::numpunct<char>
+	{
+	protected:
+		std::string do_grouping() const override { return "\3"; }
+		char do_thousands_sep() const override { return ','; }
+	};
 
 	/**
 	* Check if a path refers to an existing directory on the filesystem.
