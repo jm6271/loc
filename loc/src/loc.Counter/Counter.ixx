@@ -150,6 +150,9 @@ public:
 			case FILE_LANGUAGE::CS:
 				language_name = "C#";
 				break;
+			case FILE_LANGUAGE::Go:
+				language_name = "Go";
+				break;
 			case FILE_LANGUAGE::Rust:
 				language_name = "Rust";
 				break;
@@ -194,6 +197,7 @@ private:
 		CHeader,
 		Cpp,
 		CS,
+		Go,
 		Rust,
 		Python,
 		FSharp,
@@ -303,6 +307,10 @@ private:
 		else if (extension == ".cs")
 		{
 			return FILE_LANGUAGE::CS;
+		}
+		else if (extension == ".go")
+		{
+			return FILE_LANGUAGE::Go;
 		}
 		else if (extension == ".rs")
 		{
