@@ -47,8 +47,8 @@ public:
 	* extensions and populates the internal path list.
 	*
 	* @param jobs The number of threads to use.
-	* @param directoryPath The root directory to scan for matching files.
-	* @param extensions A list of file extensions to include (e.g. {".cpp", ".h"}).
+	* @param directoryPaths A list of directories to scan.
+	* @param filePaths A list of files to count in addition to those found in the directory scan.
 	* @param includeGenerated If false, common generated directories (obj/out/bin/.git) are excluded.
 	* @param ignoreDirs Additional directories to ignore while scanning.
 	*
@@ -56,10 +56,13 @@ public:
 	* to be counted according to the provided filters. It does not start the counting
 	* threads; call `Count()` to begin processing.
 	*/
-	Counter(unsigned int jobs, const std::filesystem::path& directoryPath,
+	Counter(unsigned int jobs, const std::vector<std::filesystem::path>& directoryPaths,
+		const std::vector<std::filesystem::path>& filePaths,
 		bool includeGenerated, const std::vector<std::filesystem::path>& ignoreDirs)
 	{
 		this->jobs = jobs;
+		this->paths = filePaths;
+		expandAllGlobsInPaths(this->paths);
 
 		DirectoryScanner directorScanner{};
 
@@ -72,7 +75,11 @@ public:
 		}
 
 		// Get the paths to all the files that match the specified pattern, excluding files in ignored directories
-		paths = directorScanner.Scan(directoryPath, ignore);
+		for (const auto& directoryPath : directoryPaths)
+		{
+			auto collectedPaths = directorScanner.Scan(directoryPath, ignore);
+			paths.insert(paths.end(), collectedPaths.begin(), collectedPaths.end());
+		}
 	}
 
 	/**

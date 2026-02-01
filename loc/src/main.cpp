@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	// set up cout to print commas in large numbers
 	cout.imbue(std::locale(std::cout.getloc(), new comma_numpunct()));
 
-	CLI::App app{"loc: count the LoC in a file or project"};
+	CLI::App app{ "loc: count the LoC in a file or project" };
 
 	// Top level options
 
@@ -40,70 +40,65 @@ int main(int argc, char** argv)
 		->default_val(jobs);
 
 	bool version = false;
-	app.add_flag("--version", version, "Print the version number and exit")
+	app.add_flag("-v,--version", version, "Print the version number and exit")
 		->capture_default_str()
 		->default_val(false);
 
-	// files command
-	auto files_command = app.add_subcommand("files", "Count lines of code in one or more files");
-	vector<fs::path> input_files{};
-	files_command->add_option("paths", input_files, "List of paths to files to count")
-		->required()
-		->expected(1, -1);
-
-	
-	// directory command
-	auto directory_command = app.add_subcommand("dir", "Count lines of code in files with provided extensions in a directory");
-	fs::path directory_path{};
 	bool include_generated = false;
-	vector<fs::path> ignore_dirs{};
-
-	directory_command->add_flag("--include-hidden", include_generated, "Include generated files in hidden directories like obj/, out/, .git/, and bin/")
+	app.add_flag("--include-hidden", include_generated, "Include hidden files and files in build directories")
 		->capture_default_str()
 		->default_val(false);
-	directory_command->add_option("-i,--ignore", ignore_dirs, "Directories to ignore (relative to the provided directory)");
-	directory_command->add_option("directory", directory_path, "Directory to search")
-		->required()
-		->expected(1);
-	
+
+	vector<fs::path> ignore_dirs{};
+	app.add_option("-i,--ignore", ignore_dirs, "Directories to ignore");
+
+	vector<fs::path> paths{};
+	app.add_option("paths", paths, "Files and Directories to count")
+		->check(CLI::ExistingPath)
+		->expected(0, -1);
+
 	// Parse the CLI arguments
 	CLI11_PARSE(app, argc, argv);
 
-	if (*files_command)
+	if (version)
 	{
-		// Count the lines of code
-		Counter counter(jobs, input_files);
-		auto lines = counter.Count();
-
-		// Print the lines of code
-		cout << std::endl;
-		counter.PrintLanguageBreakdown();
-		cout << "\nCounted " << lines << " lines of code";
-	}
-	else if (*directory_command)
-	{
-		Counter counter(jobs, directory_path, include_generated, ignore_dirs);
-		auto lines = counter.Count();
-		
-		cout << std::endl;
-		counter.PrintLanguageBreakdown();
-		cout << "\nCounted " << lines << " lines of code";
-	}
-	else if (version)
-	{
-		cout << "loc version 1.5.0\n";
+		cout << "loc version 1.6.0\n";
 		return 0;
 	}
-	else
+	else if (paths.empty())
 	{
 		std::cout << app.help() << '\n';
 		return 0;
 	}
 
+	// Separate files and directories
+	vector<fs::path> input_files{};
+	vector<fs::path> directory_paths{};
+	for (const auto& path : paths)
+	{
+		if (fs::is_directory(path))
+		{
+			directory_paths.push_back(path);
+		}
+		else if (fs::is_regular_file(path))
+		{
+			input_files.push_back(path);
+		}
+	}
+
+	Counter counter(jobs, directory_paths, input_files, include_generated, ignore_dirs);
+	auto lines = counter.Count();
+
+	// Print the lines of code
+	cout << std::endl;
+	counter.PrintLanguageBreakdown();
+	cout << "\nCounted " << lines << " lines of code";
+
+
 	// print out the total time it took to count the code
 	auto end = std::chrono::high_resolution_clock::now();
 	chrono::duration<double, std::milli> duration = end - start;
-	
+
 	cout << " in " << duration.count() << "ms\n";
 
 	return 0;
