@@ -139,5 +139,6 @@ private:
         ".hxx", ".c++", ".cc", ".ixx", ".cppm",
         ".cs",
         ".rs",
+        ".go",
     };
 };
