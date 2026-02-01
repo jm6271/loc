@@ -11,10 +11,9 @@ programming project. It is written in C++ and designed to be very fast.
 - C++
 - C#
 - F#
+- Go
 - Python
-
-Any language that uses C-style comments should work. If the program
-doesn't recognize a file extension, it uses the C line counter.
+- Rust
 
 ## Installation
 
@@ -85,7 +84,7 @@ cd loc.tests
 
 ## Usage
 
-```loc [options] subcommand```
+```loc [options] [paths...]```
 
 ### Options
 
@@ -93,58 +92,23 @@ cd loc.tests
 
 ```-j [ --jobs ]``` - Number of threads to use. Default is number of CPU cores available
 
-#### Subcommands:
+```-v [ --version ]``` - Display version
 
-##### ```files```
-
-Count the lines of code in individual files
-
-Usage: ```loc [options] files [options] path1 path2 ...```
-
-##### ```dir```
-
-Count the lines of code in files with the specified
-extensions in a directory
-
-Usage: ```loc [options] dir [options] directory```
-
-Options:
-
-`--cpp` Search for files with C++ extensions
-
-`--cs` Search for files with C# extensions
-
-`--py` Search for files with Python extensions
-
-`--fs` Search for files with F# extensions
-
-`--c` Search for files with C extensions
-
-`-e,--extention TEXT ...`  Other extensions to pass in.
-For example: `loc dir -e .cpp -e .h .`
+```--include-hidden``` - Include hidden files and files in build directory (ignored by default)
 
 `-i,--ignore TEXT ...` Directories to ignore (relative to the provided directory to search)
 
-`--include-generated` Include build files and generated files in directories like `obj/`, `out/`, `.git/`, and `bin/`
+### Paths
+
+The list of paths can be a list of paths to any files or directories. If any directories are specified,
+The application will scan the directory and its subdirectories for any files with supported file extensions.
+If any file paths are provided directly, the application will skip over them if the extension is not supported.
 
 ### Example
 
 To count the lines of code in the ```loc``` codebase from 
-the toplevel directory running on 10 threads, use this command:
+the toplevel directory use this command:
 
 ```
-loc -j 10 files ./loc/*.cpp ./loc/**/*.ixx ./loc.tests/*.cpp
+loc .
 ```
-
-Or use the directory command:
-
-```
-loc -j 10 dir --cpp .
-```
-
-## Speed
-
-```loc``` is designed to be as fast as possible using multi-threading.
-
-Counting the total lines of code in the Boost C++ libraries
-(over 4 million lines of code) takes about 2.5 seconds on 12 cores.
