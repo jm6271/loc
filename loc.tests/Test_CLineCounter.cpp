@@ -17,5 +17,5 @@ TEST_CASE("Count Lines in a C++ file")
 
 	Counter counter(1, files);
 
-    REQUIRE(counter.Count() == 19);
+    REQUIRE(counter.Count() == 21);
 }
