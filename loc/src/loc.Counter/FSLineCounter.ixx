@@ -11,61 +11,80 @@ import loc.Filesystem;
 export class FSLineCounter
 {
 public:
-	unsigned long CountLines(const std::filesystem::path& path)
-	{
-		unsigned long totalLines{};
+    unsigned long CountLines(const std::filesystem::path& path)
+    {
+        unsigned long totalLines{};
 
-		// Read file and get a vector of lines
-		std::vector<std::string> lines{};
-		FileReader::ReadFile(path, lines);
+        // Read file and get a vector of lines
+        std::vector<std::string> lines{};
+        FileReader::ReadFile(path, lines);
 
-		bool InMultiLineComment{ false };
+        bool InMultiLineComment{ false };
 
-		// count the lines
-		for (const auto& line : lines)
-		{
-			// check for whitespace
-			if (line == "")
-				continue;
+        // count the lines
+        for (const auto& line : lines)
+        {
+            // check for whitespace
+            if (line == "")
+                continue;
 
-			// check for 1 line comments
-			if (line.starts_with("//"))
-				continue;
+            bool InString{ false };
+            bool countLine{ true };
 
-			// check for multiline comments
-			if (StrContains(line, "(*"))
-			{
-				if (StrContains(line, "*)"))
-				{
-					InMultiLineComment = false;
-					if (!line.starts_with("(*") || !line.ends_with("*)"))
-					{
-						totalLines++;
-					}
-					continue;
-				}
+            // check for 1 line comments
+            if (line.starts_with("//"))
+                continue;
 
-				InMultiLineComment = true;
-				continue;
-			}
+            // check for multiline comments
+            for (size_t i = 0; i < line.size(); ++i)
+            {
+                char c = line[i];
 
-			if (StrContains(line, "*)"))
-			{
-				InMultiLineComment = false;
-				continue;
-			}
+                // Toggle string state on encountering a double quote, ignoring escaped quotes
+                if (c == '\"' && (i == 0 || line[i - 1] != '\\'))
+                {
+                    InString = !InString;
+                }
 
-			if (InMultiLineComment)
-			{
-				continue;
-			}
+                if (!InString)
+                {
+                    if (!InMultiLineComment && i + 1 < line.size() && line[i] == '(' && line[i + 1] == '*')
+                    {
+                        InMultiLineComment = true;
+                        ++i; // Skip the '*' character
+                        continue;
+                    }
 
-			// if we made it to here, this is valid code
-			totalLines++;
-		}
+                    if (InMultiLineComment && i + 1 < line.size() && line[i] == '*' && line[i + 1] == ')')
+                    {
+                        InMultiLineComment = false;
+                        ++i; // Skip the '/' character
+                        if (line.ends_with("*)") && StrContains(line, "(*") && !line.starts_with("(*"))
+                        {
+                            countLine = true;
+                        }
+                        else if (StrContains(line, "*)") && !line.ends_with("*)"))
+                        {
+                            countLine = true;
+                        }
+                        else
+                        {
+                            // full line was commented
+                            countLine = false;
+                        }
+                        continue;
+                    }
+                }
+            }
 
-		return totalLines;
-	}
+            if (!InMultiLineComment && !InString && countLine)
+            {
+                totalLines++;
+            }
+        }
+
+        return totalLines;
+    }
 
 private:
 

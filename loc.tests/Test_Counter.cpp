@@ -11,7 +11,7 @@ TEST_CASE("Test Counter with glob")
 
     auto result = counter.Count();
 
-    REQUIRE(result == 28);
+    REQUIRE(result == 30);
 }
 
 TEST_CASE("Test Counter without glob")
@@ -23,7 +23,7 @@ TEST_CASE("Test Counter without glob")
 
     auto result = counter.Count();
 
-    REQUIRE(result == 11);
+    REQUIRE(result == 13);
 }
 
 TEST_CASE("Test Counter with both globs and full paths")
@@ -32,5 +32,5 @@ TEST_CASE("Test Counter with both globs and full paths")
     auto test_dir = std::string(TEST_DATA_DIR);
     Counter counter(4, { test_dir + "/py_file.py", test_dir + "/*.cpp" });
     auto result = counter.Count();
-    REQUIRE(result == 11);
+    REQUIRE(result == 13);
 }
