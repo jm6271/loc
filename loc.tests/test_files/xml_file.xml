@@ -1,0 +1,8 @@
+<outer>
+	<!-- This is a comment -->
+	<inner attr="str that contains a <!-- comment character."/>
+	
+	<!-- This is a
+		 multiline comment
+    -->
+</outer>

@@ -11,7 +11,7 @@ TEST_CASE("Test Counter with glob")
 
     auto result = counter.Count();
 
-    REQUIRE(result == 30);
+    REQUIRE(result == 33);
 }
 
 TEST_CASE("Test Counter without glob")

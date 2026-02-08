@@ -140,5 +140,6 @@ private:
         ".cs",
         ".rs",
         ".go",
+        ".xml", ".xaml", ".html",
     };
 };
