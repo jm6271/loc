@@ -19,6 +19,7 @@ import loc.Filesystem;
 import :CLineCounter;
 import :PyLineCounter;
 import :FSLineCounter;
+import :XmlLineCounter;
 
 export class Counter
 {
@@ -160,6 +161,9 @@ public:
 			case FILE_LANGUAGE::Go:
 				language_name = "Go";
 				break;
+			case FILE_LANGUAGE::Html:
+				language_name = "HTML";
+				break;
 			case FILE_LANGUAGE::Rust:
 				language_name = "Rust";
 				break;
@@ -168,6 +172,12 @@ public:
 				break;
 			case FILE_LANGUAGE::FSharp:
 				language_name = "F#";
+				break;
+			case FILE_LANGUAGE::Xaml:
+				language_name = "XAML";
+				break;
+			case FILE_LANGUAGE::Xml:
+				language_name = "XML";
 				break;
 			default:
 				language_name = "Other";
@@ -205,9 +215,12 @@ private:
 		Cpp,
 		CS,
 		Go,
+		Html,
 		Rust,
 		Python,
 		FSharp,
+		Xaml,
+		Xml,
 		Other
 	};
 
@@ -263,6 +276,11 @@ private:
 		else if (language == FILE_LANGUAGE::FSharp)
 		{
 			FSLineCounter counter;
+			lines = counter.CountLines(path);
+		}
+		else if (language == FILE_LANGUAGE::Html || language == FILE_LANGUAGE::Xaml || language == FILE_LANGUAGE::Xml)
+		{
+			XmlLineCounter counter;
 			lines = counter.CountLines(path);
 		}
 		else
@@ -322,6 +340,18 @@ private:
 		else if (extension == ".rs")
 		{
 			return FILE_LANGUAGE::Rust;
+		}
+		else if (extension == ".xml")
+		{
+			return FILE_LANGUAGE::Xml;
+		}
+		else if (extension == ".html")
+		{
+			return FILE_LANGUAGE::Html;
+		}
+		else if (extension == ".xaml")
+		{
+			return FILE_LANGUAGE::Xaml;
 		}
 		else
 		{

@@ -19,6 +19,7 @@ TEST_CASE("Test DirectoryScanner")
     expected.push_back(test_dir + "/cpp_file2.cpp");
     expected.push_back(test_dir + "/header.h");
     expected.push_back(test_dir + "/fs_file.fs");
+    expected.push_back(test_dir + "/xml_file.xml");
 
     // Actual data
     std::vector<std::filesystem::path> actual{};
