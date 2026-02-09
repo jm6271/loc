@@ -29,10 +29,6 @@ target_sources(loc.Counter
   PUBLIC
     FILE_SET CXX_MODULES FILES
       src/loc.Counter/loc.Counter.ixx
-      src/loc.Counter/CLineCounter.ixx
-      src/loc.Counter/PyLineCounter.ixx
-      src/loc.Counter/FSLineCounter.ixx
-      src/loc.Counter/XmlLineCounter.ixx
       src/loc.Counter/LineCounter.ixx
       src/loc.Counter/Counter.ixx
 )

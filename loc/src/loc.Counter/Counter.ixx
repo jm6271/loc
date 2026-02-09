@@ -16,10 +16,7 @@ module;
 export module loc.Counter:Counter;
 
 import loc.Filesystem;
-import :CLineCounter;
-import :PyLineCounter;
-import :FSLineCounter;
-import :XmlLineCounter;
+import :LineCounter;
 
 export class Counter
 {
@@ -31,7 +28,7 @@ public:
 	* @param paths A vector of paths to search for files. Cannot include directories.
 	*
 	* This constructor initializes the Counter object and expands any glob patterns
-	* found in the provided paths. It does not start counting—call `Count()` to start
+	* found in the provided paths. It does not start countingï¿½call `Count()` to start
 	* the work using the configured number of threads.
 	*/
 	Counter(unsigned int jobs, const std::vector<std::filesystem::path>& paths)
@@ -270,23 +267,23 @@ private:
 		// use the correct line counting class to count the lines of code in the file
 		if (language == FILE_LANGUAGE::Python)
 		{
-			PyLineCounter counter;
-			lines = counter.CountLines(path);
+			LineCounter counter;
+			lines = counter.CountLines(path, "#", "", "");
 		}
 		else if (language == FILE_LANGUAGE::FSharp)
 		{
-			FSLineCounter counter;
-			lines = counter.CountLines(path);
+			LineCounter counter;
+			lines = counter.CountLines(path, "//", "(*", "*)");
 		}
 		else if (language == FILE_LANGUAGE::Html || language == FILE_LANGUAGE::Xaml || language == FILE_LANGUAGE::Xml)
 		{
-			XmlLineCounter counter;
-			lines = counter.CountLines(path);
+			LineCounter counter;
+			lines = counter.CountLines(path, "", "<!--", "-->");
 		}
 		else
 		{
-			CLineCounter counter;
-			lines = counter.CountLines(path);
+			LineCounter counter;
+			lines = counter.CountLines(path, "//", "/*", "*/");
 		}
 
 		std::scoped_lock lock(language_line_counts_mutex);
