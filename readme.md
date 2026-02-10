@@ -8,12 +8,23 @@ programming project. It is written in C++ and designed to be very fast.
 ```loc``` supports the following languages:
 
 - C
-- C++
 - C#
+- C++
 - F#
 - Go
+- HTML
+- Java
+- JavaScript
+- JSX/TSX
+- Kotlin
+- PowerShell
 - Python
+- Ruby
 - Rust
+- Shell
+- TypeScript
+- XAML
+- XML
 
 ## Installation
 
