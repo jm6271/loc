@@ -141,5 +141,10 @@ private:
         ".rs",
         ".go",
         ".xml", ".xaml", ".html",
+        ".java", ".kt", ".kts",
+        ".js", ".jsx", ".ts", ".tsx",
+        ".rb",
+        ".sh", ".zsh",
+        ".ps1", ".psd1", "psm1",
     };
 };

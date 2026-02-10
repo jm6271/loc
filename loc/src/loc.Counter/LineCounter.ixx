@@ -33,10 +33,6 @@ public:
             bool InString{ false };
             bool countLine{ true };
 
-            // check for 1 line comments
-            if (!inlineComment.empty() && line.starts_with(inlineComment))
-                continue;
-
             // check for multiline comments
             for (size_t i = 0; i < line.size(); ++i)
             {
@@ -86,6 +82,10 @@ public:
                     }
                 }
             }
+
+            // check for 1 line comments
+            if (!inlineComment.empty() && line.starts_with(inlineComment))
+                continue;
 
             if (!InMultiLineComment && !InString && countLine)
             {

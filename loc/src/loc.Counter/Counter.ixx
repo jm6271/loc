@@ -143,6 +143,9 @@ public:
 			std::string language_name;
 			switch (language)
 			{
+			case FILE_LANGUAGE::Shell:
+				language_name = "Shell";
+				break;
 			case FILE_LANGUAGE::C:
 				language_name = "C";
 				break;
@@ -161,8 +164,26 @@ public:
 			case FILE_LANGUAGE::Html:
 				language_name = "HTML";
 				break;
+			case FILE_LANGUAGE::Java:
+				language_name = "Java";
+				break;
+			case FILE_LANGUAGE::JavaScript:
+				language_name = "JavaScript";
+				break;
+			case FILE_LANGUAGE::Kotlin:
+				language_name = "Kotlin";
+				break;
+			case FILE_LANGUAGE::Ruby:
+				language_name = "Ruby";
+				break;
 			case FILE_LANGUAGE::Rust:
 				language_name = "Rust";
+				break;
+			case FILE_LANGUAGE::TypeScript:
+				language_name = "TypeScript";
+				break;
+			case FILE_LANGUAGE::PowerShell:
+				language_name = "PowerShell";
 				break;
 			case FILE_LANGUAGE::Python:
 				language_name = "Python";
@@ -213,7 +234,14 @@ private:
 		CS,
 		Go,
 		Html,
+		Java,
+		JavaScript,
+		TypeScript,
+		Kotlin,
+		Ruby,
 		Rust,
+		Shell,
+		PowerShell,
 		Python,
 		FSharp,
 		Xaml,
@@ -265,10 +293,20 @@ private:
 		unsigned long lines = 0;
 
 		// use the correct line counting class to count the lines of code in the file
-		if (language == FILE_LANGUAGE::Python)
+		if (language == FILE_LANGUAGE::Python || language == FILE_LANGUAGE::Shell)
 		{
 			LineCounter counter;
 			lines = counter.CountLines(path, "#", "", "");
+		}
+		else if (language == FILE_LANGUAGE::PowerShell)
+		{
+			LineCounter counter;
+			lines = counter.CountLines(path, "#", "<#", "#>");
+		}
+		else if (language == FILE_LANGUAGE::Ruby)
+		{
+			LineCounter counter;
+			lines = counter.CountLines(path, "#", "=begin", "=end");
 		}
 		else if (language == FILE_LANGUAGE::FSharp)
 		{
@@ -334,9 +372,37 @@ private:
 		{
 			return FILE_LANGUAGE::Go;
 		}
+		else if (extension == ".java")
+		{
+			return FILE_LANGUAGE::Java;
+		}
+		else if (extension == ".js" || extension == ".jsx")
+		{
+			return FILE_LANGUAGE::JavaScript;
+		}
+		else if (extension == ".kt" || extension == ".kts")
+		{
+			return FILE_LANGUAGE::Kotlin;
+		}
+		else if (extension == ".ps1" || extension == ".psd1" || extension == ".psm1")
+		{
+			return FILE_LANGUAGE::PowerShell;
+		}
+		else if (extension == ".rb")
+		{
+			return FILE_LANGUAGE::Ruby;
+		}
 		else if (extension == ".rs")
 		{
 			return FILE_LANGUAGE::Rust;
+		}
+		else if (extension == ".sh" || extension == ".zsh")
+		{
+			return FILE_LANGUAGE::Shell;
+		}
+		else if (extension == ".ts" || extension == ".tsx")
+		{
+			return FILE_LANGUAGE::TypeScript;
 		}
 		else if (extension == ".xml")
 		{
