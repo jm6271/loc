@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
 	if (version)
 	{
-		cout << "loc version 1.6.1\n";
+		cout << "loc version 1.7.0\n";
 		return 0;
 	}
 	else if (paths.empty())
