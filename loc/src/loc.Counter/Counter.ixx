@@ -359,7 +359,7 @@ private:
 		{
 			return FILE_LANGUAGE::CHeader;
 		}
-		else if (extension == ".cpp" || extension == ".hpp" || extension == ".cxx" ||
+		else if (extension == ".cpp" || extension == ".hpp" || extension == ".cxx" || extension == ".ino" ||
 			extension == ".hxx" || extension == ".c++" || extension == ".cc" || extension == ".ixx" || extension == ".cppm")
 		{
 			return FILE_LANGUAGE::Cpp;
