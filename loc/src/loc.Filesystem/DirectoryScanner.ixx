@@ -135,7 +135,7 @@ private:
         ".c", ".h",
         ".py", ".pyw",
         ".fs", ".fsx",
-        ".cpp", ".hpp", ".cxx",
+        ".cpp", ".hpp", ".cxx", ".ino",
         ".hxx", ".c++", ".cc", ".ixx", ".cppm",
         ".cs",
         ".rs",
