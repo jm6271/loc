@@ -1,5 +1,4 @@
-module;
-
+#pragma once
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -8,9 +7,7 @@ module;
 #include <cctype>
 #include <system_error>
 
-export module loc.Filesystem:DirectoryScanner;
-
-export class DirectoryScanner
+class DirectoryScanner
 {
 public:
     DirectoryScanner() = default;
@@ -76,14 +73,14 @@ public:
                         continue;
                     }
                 }
-                
+
                 // Skip directories starting with '.' (hidden directories)
                 auto dirname = de.path().filename().string();
                 if (!dirname.empty() && dirname[0] == '.') {
                     it.disable_recursion_pending();
                     continue;
                 }
-                
+
                 // not a file -> continue
                 continue;
             }
@@ -117,7 +114,6 @@ private:
     // Normalize an extension: ensure it starts with '.' and (optionally) lowercase it.
     inline std::string normalize_ext(std::string_view ext, bool case_insensitive) {
         if (ext.empty()) return std::string{};
-        size_t pos = 0;
         // if user passed "txt" convert to ".txt"
         if (ext.front() != '.') {
             std::string tmp;

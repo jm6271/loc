@@ -1,14 +1,11 @@
-module;
+#pragma once
 
 #include <string>
 #include <vector>
 #include <filesystem>
+#include "loc.Filesystem/FileReader.h"
 
-export module loc.Counter:LineCounter;
-
-import loc.Filesystem;
-
-export class LineCounter
+class LineCounter
 {
 public:
 

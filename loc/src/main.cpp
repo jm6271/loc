@@ -20,7 +20,7 @@ protected:
 using namespace std;
 namespace fs = std::filesystem;
 
-import loc.Counter;
+#include "loc.Counter/Counter.h"
 
 int main(int argc, char** argv)
 {

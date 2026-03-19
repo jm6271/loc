@@ -1,4 +1,4 @@
-module;
+#pragma once
 
 #include <string>
 #include <vector>
@@ -7,9 +7,7 @@ module;
 #include <iostream>
 #include <fstream>
 
-export module loc.Filesystem:FileReader;
-
-export class FileReader
+class FileReader
 {
 public:
 

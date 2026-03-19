@@ -1,4 +1,4 @@
-module;
+#pragma once
 
 #include <filesystem>
 #include <string>
@@ -6,10 +6,7 @@ module;
 #include <vector>
 #include <iostream>
 
-
-export module loc.Filesystem:ExpandGlob;
-
-export class ExpandGlob
+class ExpandGlob
 {
 public:
 

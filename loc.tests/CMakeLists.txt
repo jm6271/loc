@@ -14,27 +14,34 @@ add_compile_definitions(TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_files")
 
 find_package(Catch2 3 REQUIRED)
 
+set(LOC_SOURCES
+    ../loc/src/loc.Filesystem/DirectoryScanner.cpp
+    ../loc/src/loc.Filesystem/ExpandGlob.cpp
+    ../loc/src/loc.Filesystem/FileReader.cpp
+    ../loc/src/loc.Counter/Counter.cpp
+    ../loc/src/loc.Counter/LineCounter.cpp
+)
+
 # Add source to this project's executable.
-add_executable (loc.tests "main.cpp" "Test_CLineCounter.cpp" "Test_PyLineCounter.cpp" "Test_DirectoryScanner.cpp" "Test_Counter.cpp"
-                  "Test_FSLineCounter.cpp"  "Test_ExpandGlob.cpp"  "Test_XmlLineCounter.cpp")
+add_executable(loc.tests
+    main.cpp
+    Test_Counter.cpp
+    Test_CLineCounter.cpp
+    Test_DirectoryScanner.cpp
+    Test_ExpandGlob.cpp
+    Test_FSLineCounter.cpp
+    Test_PyLineCounter.cpp
+    Test_XmlLineCounter.cpp
+    ${LOC_SOURCES}
+)
 
-target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS})
-target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain loc.Filesystem loc.Counter)
-
-include_directories("../loc")
+target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS} ../loc/src)
+target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET loc.tests PROPERTY CXX_STANDARD 20)
-
-  # Enable experimental modules support
-  if(MSVC)
-    target_compile_options(loc.tests PRIVATE /experimental:module)
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(loc.tests PRIVATE -fmodules-ts)
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(loc.tests PRIVATE -fmodules)
-  endif()
 endif()
 
+include(CTest)
 include(Catch)
 catch_discover_tests(loc.tests)

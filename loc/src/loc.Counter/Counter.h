@@ -1,4 +1,4 @@
-module;
+#pragma once
 
 #include <vector>
 #include <string>
@@ -13,12 +13,11 @@ module;
 #include <map>
 #include <iomanip>
 
-export module loc.Counter:Counter;
+#include "loc.Filesystem/DirectoryScanner.h"
+#include "loc.Filesystem/ExpandGlob.h"
+#include "loc.Counter/LineCounter.h"
 
-import loc.Filesystem;
-import :LineCounter;
-
-export class Counter
+class Counter
 {
 public:
 
@@ -28,7 +27,7 @@ public:
 	* @param paths A vector of paths to search for files. Cannot include directories.
 	*
 	* This constructor initializes the Counter object and expands any glob patterns
-	* found in the provided paths. It does not start counting�call `Count()` to start
+	* found in the provided paths. It does not start counting—call `Count()` to start
 	* the work using the configured number of threads.
 	*/
 	Counter(unsigned int jobs, const std::vector<std::filesystem::path>& paths)
@@ -128,7 +127,7 @@ public:
 
 		// set up cout to print commas in large numbers
 		std::cout.imbue(std::locale(std::cout.getloc(), new comma_numpunct()));
-		
+
 		std::cout << "+-----------------+----------------------+----------------------+\n";
 		std::cout
 			<< "| "
@@ -450,7 +449,7 @@ private:
 	}
 
 	/**
-    * Checks if a file is located inside a directory (including subdirectories).
+	* Checks if a file is located inside a directory (including subdirectories).
 	*
 	* @param parentDir The parent directory to check.
 	* @param filePath The file path to check.
