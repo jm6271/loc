@@ -1,4 +1,5 @@
 #include "DirectoryScanner.h"
+
 #include <algorithm>
 #include <cctype>
 #include <string_view>

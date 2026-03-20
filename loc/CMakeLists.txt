@@ -13,15 +13,15 @@ endif()
 find_package(CLI11 CONFIG REQUIRED)
 
 set(LOC_SOURCES
-    src/loc.Filesystem/DirectoryScanner.cpp
-    src/loc.Filesystem/ExpandGlob.cpp
-    src/loc.Filesystem/FileReader.cpp
-    src/loc.Counter/Counter.cpp
-    src/loc.Counter/LineCounter.cpp
+    src/DirectoryScanner.cpp
+    src/ExpandGlob.cpp
+    src/FileReader.cpp
+    src/Counter.cpp
+    src/LineCounter.cpp
 )
 
 add_executable(loc src/main.cpp ${LOC_SOURCES})
-target_include_directories(loc PRIVATE src)
+target_include_directories(loc PRIVATE include)
 target_link_libraries(loc PRIVATE CLI11::CLI11)
 
 # Release flags

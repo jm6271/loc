@@ -15,11 +15,11 @@ add_compile_definitions(TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test_files")
 find_package(Catch2 3 REQUIRED)
 
 set(LOC_SOURCES
-    ../loc/src/loc.Filesystem/DirectoryScanner.cpp
-    ../loc/src/loc.Filesystem/ExpandGlob.cpp
-    ../loc/src/loc.Filesystem/FileReader.cpp
-    ../loc/src/loc.Counter/Counter.cpp
-    ../loc/src/loc.Counter/LineCounter.cpp
+    ../loc/src/DirectoryScanner.cpp
+    ../loc/src/ExpandGlob.cpp
+    ../loc/src/FileReader.cpp
+    ../loc/src/Counter.cpp
+    ../loc/src/LineCounter.cpp
 )
 
 # Add source to this project's executable.
@@ -35,7 +35,7 @@ add_executable(loc.tests
     ${LOC_SOURCES}
 )
 
-target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS} ../loc/src)
+target_include_directories(loc.tests PRIVATE ${Catch2_INCLUDE_DIRS} ../loc/include)
 target_link_libraries(loc.tests PRIVATE Catch2::Catch2WithMain)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

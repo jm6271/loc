@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "loc.Counter/Counter.h"
+#include "Counter.h"
 
 TEST_CASE("Test Counter with glob")
 {

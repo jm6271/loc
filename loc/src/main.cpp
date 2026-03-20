@@ -8,6 +8,8 @@
 
 #include <CLI/CLI.hpp>
 
+#include "Counter.h"
+
 
 // struct for printing out large numbers with commas
 struct comma_numpunct : std::numpunct<char>
@@ -20,7 +22,6 @@ protected:
 using namespace std;
 namespace fs = std::filesystem;
 
-#include "loc.Counter/Counter.h"
 
 int main(int argc, char** argv)
 {

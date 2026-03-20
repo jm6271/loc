@@ -8,9 +8,9 @@
 #include <map>
 #include <mutex>
 
-#include "loc.Filesystem/DirectoryScanner.h"
-#include "loc.Filesystem/ExpandGlob.h"
-#include "loc.Counter/LineCounter.h"
+#include "DirectoryScanner.h"
+#include "ExpandGlob.h"
+#include "LineCounter.h"
 
 class Counter
 {

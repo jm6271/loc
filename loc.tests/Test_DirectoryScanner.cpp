@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <filesystem>
 
-#include "loc.Filesystem/DirectoryScanner.h"
+#include "DirectoryScanner.h"
 
 TEST_CASE("Test DirectoryScanner")
 {
