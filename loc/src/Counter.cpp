@@ -30,7 +30,7 @@ Counter::Counter(unsigned int jobs, const std::vector<std::filesystem::path>& di
 	std::vector<std::filesystem::path> ignore = ignoreDirs;
 	if (!includeGenerated)
 	{
-		std::vector<std::filesystem::path> generatedDirs{ "obj", "out", ".git", "bin" };
+		std::vector<std::filesystem::path> generatedDirs{ "obj", "out", ".git", "bin", "venv", "node_modules" };
 		ignore.insert(ignore.end(), generatedDirs.begin(), generatedDirs.end());
 	}
 
