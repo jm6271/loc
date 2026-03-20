@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <string>
 
-import loc.Counter;
+#include "Counter.h"
 
 TEST_CASE("Count lines in a F# file")
 {

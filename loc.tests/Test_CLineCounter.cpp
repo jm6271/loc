@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-import loc.Counter;
+#include "Counter.h"
 
 TEST_CASE("Count Lines in a C++ file")
 {
